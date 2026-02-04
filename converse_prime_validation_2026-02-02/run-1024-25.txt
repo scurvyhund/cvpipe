@@ -1,0 +1,73 @@
+jim@nitroII:~/programming/c/BigFermat/gmp-cvo$ nohup ./run_nitroII_10e24-25.sh > nitroII.log 2>&1 &
+[1] 31122
+
+jim@nitroII:~/programming/c/BigFermat/gmp-cvo$ cat nitroII.log
+nohup: ignoring input
+==========================================
+CVPipe Distributed Search - nitroII
+==========================================
+Range: 6.94×10^24 to 10^25 (33% of total)
+Machine: nitroII (8 threads)
+Started: Sun Feb  1 10:30:32 PM AKST 2026
+==========================================
+
+Stage 1: Generating candidates...
+jim@nitroII:~/programming/c/BigFermat/gmp-cvo$ top
+
+top - 22:44:33 up 9 days,  5:20,  2 users,  load average: 16.17, 15.13, 9.62
+Tasks: 227 total,   2 running, 225 sleeping,   0 stopped,   0 zombie
+%Cpu(s): 99.9 us,  0.1 sy,  0.0 ni,  0.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :  40022.1 total,  35461.0 free,   1551.8 used,   3817.7 buff/cache
+MiB Swap:  40865.0 total,  40865.0 free,      0.0 used.  38470.3 avail Mem
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+  31127 jim       20   0 1109424   2652   2216 R 800.0   0.0 111:42.24 gen_candidates_
+
+nohup: ignoring input
+==========================================
+CVPipe Distributed Search - nitroIII
+==========================================
+Range: 10^24 to 6.94×10^24 (66% of total)
+Machine: nitroIII (16 threads)
+Started: Sun Feb  1 10:29:25 PM AKST 2026
+==========================================
+
+Stage 1: Generating candidates...
+
+Stage 1: Generating candidates...
+jim@nitroII:~/programming/c/BigFermat/gmp-cvo$ Read from remote host nitroii: Connection timed out
+Connection to nitroii closed.
+client_loop: send disconnect: Broken pipe
+jim@nitroIII:~/programming/c/BigFermat/gmp-cvo/distrib_compute$
+
+
+Listing of files after broken pipe:
+
+for nitroII all pxx.dat and primexx.dat files were created and all were 0 bytes, no data.
+Also there were 16 px.dat and primexx.dat files...all zero bytes
+
+
+for nitroIII :
+
+jim@nitroIII:~/programming/c/BigFermat/gmp-cvo$ ll 10e24-25-nitroIII-20260201-222925/
+total 2481457788
+drwxr-xr-x. 1 jim jim          224 Feb  1 22:29 .
+drwxr-xr-x. 1 jim jim          922 Feb  2 14:37 ..
+-rw-r--r--. 1 jim jim 157267206144 Feb  2 03:50 p01.dat
+-rw-r--r--. 1 jim jim 158232231936 Feb  2 03:50 p02.dat
+-rw-r--r--. 1 jim jim 159096242176 Feb  2 03:40 p03.dat
+-rw-r--r--. 1 jim jim 156813352960 Feb  2 03:50 p04.dat
+-rw-r--r--. 1 jim jim 159158493184 Feb  2 03:50 p05.dat
+-rw-r--r--. 1 jim jim 158007865344 Feb  2 03:50 p06.dat
+-rw-r--r--. 1 jim jim 158304079872 Feb  2 03:50 p07.dat
+-rw-r--r--. 1 jim jim 158607872000 Feb  2 03:40 p08.dat
+-rw-r--r--. 1 jim jim 159316729856 Feb  2 03:50 p09.dat
+-rw-r--r--. 1 jim jim 160833044480 Feb  2 03:40 p10.dat
+-rw-r--r--. 1 jim jim 160711020544 Feb  2 03:50 p11.dat
+-rw-r--r--. 1 jim jim 158464491520 Feb  2 03:40 p12.dat
+-rw-r--r--. 1 jim jim 158143578112 Feb  2 03:50 p13.dat
+-rw-r--r--. 1 jim jim 158899924992 Feb  2 03:40 p14.dat
+-rw-r--r--. 1 jim jim 159247347712 Feb  2 03:50 p15.dat
+-rw-r--r--. 1 jim jim 159909294080 Feb  2 03:40 p16.dat
+jim@nitroIII:~/programming/c/BigFermat/gmp-cvo$ cd
+j

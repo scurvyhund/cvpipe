@@ -1,0 +1,22 @@
+
+CVPipe Stage 4: CON-VERSE CHECKER (GMP Edition)
+
+	Input:    emirps.dat
+	Output:   converse.dat
+	Checking: Both p and reverse(p) are n^2 + (n+1)^2
+	Range:    Unlimited (supports u128 and beyond)
+=============================================================
+
+Processing emirp pairs...
+
+
+CON-VERSE CHECK COMPLETE
+
+	Emirp pairs checked:       8807814
+	CON-VERSE FOUND:                 0
+	Elapsed time:                    3 seconds
+=============================================================
+
+	No con-verse pairs found in this range.
+
+===========================================================

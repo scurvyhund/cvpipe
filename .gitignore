@@ -24,3 +24,6 @@ tags
 
 # Backup source files
 *-bkup.c
+
+# Vim swap files
+*.swp

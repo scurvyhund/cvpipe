@@ -1,0 +1,121 @@
+nohup time ./gen_candidates_range_gmp 223606797750 1000000000000000000000000 && ./filter_primes_gmp && ./check_emirp_gmp && ./check_palindrome_gmp && ./check_converse_gmp 
+nohup: ignoring input and appending output to 'nohup.out'
+ll
+
+CVPipe Stage 2: Prime Filter (GMP Edition)
+
+	Input:    p01.dat...p16.dat (sums of consecutive squares)
+	Output:   primes01.dat through primes16.dat
+	Method:   GMP Miller-Rabin (25 rounds)
+	Threads:  16
+	Range:    Unlimited (supports u128 and beyond)
+==============================================================
+
+[Thread  6] Complete: 2003524801 candidates -> 171750446 primes (8.57%)
+[Thread  2] Complete: 2003524799 candidates -> 171740590 primes (8.57%)
+[Thread 13] Complete: 2003524801 candidates -> 171725523 primes (8.57%)
+[Thread  1] Complete: 2003524800 candidates -> 171725253 primes (8.57%)
+[Thread 14] Complete: 2003524800 candidates -> 171734629 primes (8.57%)
+[Thread 10] Complete: 2003524800 candidates -> 171749954 primes (8.57%)
+[Thread  9] Complete: 2003524800 candidates -> 171732573 primes (8.57%)
+[Thread  5] Complete: 2003524799 candidates -> 171740966 primes (8.57%)
+[Thread  3] Complete: 2003524800 candidates -> 171726809 primes (8.57%)
+[Thread 12] Complete: 2003524800 candidates -> 171726220 primes (8.57%)
+[Thread 11] Complete: 2003524801 candidates -> 171730666 primes (8.57%)
+[Thread  4] Complete: 2003524800 candidates -> 171743343 primes (8.57%)
+[Thread  8] Complete: 2003524800 candidates -> 171728050 primes (8.57%)
+[Thread  7] Complete: 2003524800 candidates -> 171736490 primes (8.57%)
+[Thread  0] Complete: 2003524800 candidates -> 171731316 primes (8.57%)
+[Thread 15] Complete: 2003524801 candidates -> 171735416 primes (8.57%)
+
+FILTERING COMPLETE
+
+	Total candidates:   32056396802
+	Primes found:        2747758244
+	Prime density:            8.57%
+	Elapsed time:             12933 seconds
+==============================================================
+
+[Thread 11] Complete: 171730666 primes, 0 palindromes, 13210339 emirps
+[Thread 10] Complete: 171749954 primes, 0 palindromes, 13203554 emirps
+[Thread 12] Complete: 171726220 primes, 0 palindromes, 13211812 emirps
+[Thread  4] Complete: 171743343 primes, 0 palindromes, 13206764 emirps
+[Thread  3] Complete: 171726809 primes, 0 palindromes, 13201122 emirps
+[Thread  8] Complete: 171728050 primes, 0 palindromes, 13206769 emirps
+[Thread 14] Complete: 171734629 primes, 0 palindromes, 13204573 emirps
+[Thread  1] Complete: 171725253 primes, 0 palindromes, 13202580 emirps
+[Thread  9] Complete: 171732573 primes, 0 palindromes, 13200279 emirps
+[Thread  7] Complete: 171736490 primes, 0 palindromes, 13208093 emirps
+[Thread 13] Complete: 171725523 primes, 0 palindromes, 13198222 emirps
+[Thread  5] Complete: 171740966 primes, 0 palindromes, 13205437 emirps
+[Thread  6] Complete: 171750446 primes, 0 palindromes, 13198222 emirps
+[Thread 15] Complete: 171735416 primes, 0 palindromes, 13206272 emirps
+[Thread  0] Complete: 171731316 primes, 0 palindromes, 13204757 emirps
+[Thread  2] Complete: 171740590 primes, 0 palindromes, 13204937 emirps
+
+EMIRP CHECK COMPLETE
+
+	Total primes:        2747758244
+	Palindromes:                  0
+	Emirps found:         211273732 
+	Elapsed time:              1308 seconds
+==============================================================
+
+CVPipe Stage 3.5: Otto Prime Hunter (GMP Edition)
+
+	Input:    primes01.dat through primes16.dat
+	Output:   otto_primes.dat
+	Filter:   Palindromic primes (4n+1, consecutive squares)
+	Threads:  16
+	Range:    Unlimited (supports u128 and beyond)
+==============================================================
+
+[Thread  2] Complete: 171740590 primes, 0 palindromes
+[Thread  3] Complete: 171726809 primes, 0 palindromes
+[Thread 12] Complete: 171726220 primes, 0 palindromes
+[Thread  1] Complete: 171725253 primes, 0 palindromes
+[Thread  7] Complete: 171736490 primes, 0 palindromes
+[Thread 14] Complete: 171734629 primes, 0 palindromes
+[Thread  6] Complete: 171750446 primes, 0 palindromes
+[Thread  9] Complete: 171732573 primes, 0 palindromes
+[Thread  8] Complete: 171728050 primes, 0 palindromes
+[Thread 13] Complete: 171725523 primes, 0 palindromes
+[Thread  5] Complete: 171740966 primes, 0 palindromes
+[Thread 10] Complete: 171749954 primes, 0 palindromes
+[Thread  4] Complete: 171743343 primes, 0 palindromes
+[Thread 11] Complete: 171730666 primes, 0 palindromes
+[Thread  0] Complete: 171731316 primes, 0 palindromes
+[Thread 15] Complete: 171735416 primes, 0 palindromes
+
+OTTO PRIMES FOUND (Palindromic)
+
+=============================================================
+
+PALINDROME CHECK COMPLETE
+
+	Total primes:        2747758244
+	Otto primes:                  0 
+	Elapsed time:                40 seconds
+=============================================================
+
+CVPipe Stage 4: CON-VERSE CHECKER (GMP Edition)
+
+	Input:    emirps.dat
+	Output:   converse.dat
+	Checking: Both p and reverse(p) are n^2 + (n+1)^2
+	Range:    Unlimited (supports u128 and beyond)
+=============================================================
+
+Processing emirp pairs...
+
+
+CON-VERSE CHECK COMPLETE
+
+	Emirp pairs checked:     211273732
+	CON-VERSE FOUND:                 0
+	Elapsed time:                   91 seconds
+=============================================================
+
+	No con-verse pairs found in this range.
+
+===========================================================
