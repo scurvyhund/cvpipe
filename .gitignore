@@ -1,0 +1,26 @@
+# Compiled binaries
+generate_candidates_gmp
+gen_candidates_range_gmp
+filter_primes_gmp
+check_emirp_gmp
+check_palindrome_gmp
+check_converse_gmp
+
+# Pipeline data files
+*.dat
+
+# Logs
+*.log
+nohup.out
+tail-out.txt
+
+# Archives
+*.zip
+*.tar.gz
+zips/
+
+# Tags
+tags
+
+# Backup source files
+*-bkup.c
