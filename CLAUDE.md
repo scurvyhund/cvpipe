@@ -83,4 +83,4 @@ The pipeline is 5 stages executed sequentially. Each stage reads from the previo
 
 ## Documentation
 
-Detailed technical docs are in `docs/cvo-pipe_ref/` (technical overview, command reference, optimization history, performance guide). AWS deployment guide is in `cvpipe-aws-setup/README.md`.
+Detailed technical docs are in `docs/cvo-pipe_ref/` (technical overview, command reference, optimization history, performance guide).
