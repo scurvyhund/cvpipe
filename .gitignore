@@ -25,5 +25,8 @@ tags
 # Backup source files
 *-bkup.c
 
+# Word documents
+*.docx
+
 # Vim swap files
 *.swp
