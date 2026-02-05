@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(ls:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(du:*)",
+      "Bash(python3:*)",
+      "Bash(gcc:*)",
+      "Bash(./verify_consec_sq:*)",
+      "Bash(./filter_primes_gmp:*)"
     ]
   }
 }

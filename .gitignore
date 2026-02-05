@@ -5,6 +5,7 @@ filter_primes_gmp
 check_emirp_gmp
 check_palindrome_gmp
 check_converse_gmp
+verify_consec_sq
 
 # Pipeline data files
 *.dat

@@ -23,6 +23,22 @@
 #define NUM_THREADS 16
 #define MR_ROUNDS 25
 
+/* Quick check: is p a sum of consecutive squares? p = n² + (n+1)² = 2n² + 2n + 1
+ * Requires: 2p - 1 is a perfect square.
+ * Since 2p-1 is always odd, its square root s is odd, so n = (s-1)/2 is integral.
+ * No parity check needed beyond the perfect square test.
+ */
+static bool is_consec_sq_sum(mpz_t p, mpz_t disc) {
+    /* All consecutive square sums ≡ 1 (mod 4) — filters ~75% instantly */
+    if (mpz_fdiv_ui(p, 4) != 1) return false;
+
+    /* disc = 2p - 1 */
+    mpz_mul_ui(disc, p, 2);
+    mpz_sub_ui(disc, disc, 1);
+
+    return mpz_perfect_square_p(disc) != 0;
+}
+
 /* Reverse a string using thread-local buffer - NO MALLOC! */
 static char* reverse_string(const char *str) {
     static __thread char reversed[256];  // Thread-safe, per-thread buffer
@@ -65,20 +81,23 @@ int main(void) {
     
    uint64_t total_primes = 0;
    uint64_t total_palindromes = 0;
-   uint64_t total_emirps = 0;  // Changed to counter only
+   uint64_t total_consec_pass = 0;
+   uint64_t total_emirps = 0;
     
    omp_set_num_threads(NUM_THREADS);
     
-   #pragma omp parallel reduction(+:total_primes,total_palindromes,total_emirps)
+   #pragma omp parallel reduction(+:total_primes,total_palindromes,total_consec_pass,total_emirps)
    {
       int tid = omp_get_thread_num();
       char infile[32];
-        
+
       // GMP variables for this thread
-      mpz_t reversed_num;
+      mpz_t reversed_num, disc;
       mpz_init(reversed_num);
-      
-      int local_emirps = 0;  // Just a counter now
+      mpz_init(disc);
+
+      int local_emirps = 0;
+      int local_consec_pass = 0;
       
       // Open input file
       snprintf(infile, sizeof(infile), "primes%02d.dat", tid + 1);
@@ -108,13 +127,18 @@ int main(void) {
          char *reversed_str = reverse_string(line);
             
          if (mpz_set_str(reversed_num, reversed_str, 10) == 0) {
-            
+
+            // Check if reverse is a consecutive square sum BEFORE expensive primality test
+            if (!is_consec_sq_sum(reversed_num, disc))
+               continue;
+            local_consec_pass++;
+
             if (mpz_probab_prime_p(reversed_num, MR_ROUNDS) > 0) {
-               // Found emirp - write immediately
+               // Found emirp whose reverse is also a consec sq sum
                #pragma omp critical
                {
                   fprintf(fp_out, "%s %s\n", line, reversed_str);
-                  fflush(fp_out);  // Ensure it's written
+                  fflush(fp_out);
                }
                local_emirps++;
             }
@@ -123,12 +147,14 @@ int main(void) {
         
        fclose(fp);
        mpz_clear(reversed_num);
-        
-       printf("[Thread %2d] Complete: %lu primes, %lu palindromes, %d emirps\n",
-              tid, primes_read, palindromes_found, local_emirps);
-        
+       mpz_clear(disc);
+
+       printf("[Thread %2d] Complete: %lu primes, %lu palindromes, %d consec_sq, %d emirps\n",
+              tid, primes_read, palindromes_found, local_consec_pass, local_emirps);
+
        total_primes += primes_read;
        total_palindromes += palindromes_found;
+       total_consec_pass += local_consec_pass;
        total_emirps += local_emirps;
     }
     
@@ -140,7 +166,10 @@ int main(void) {
     printf("\nEMIRP CHECK COMPLETE\n");
     printf("\n\tTotal primes:      %12lu\n", total_primes);
     printf("\tPalindromes:       %12lu\n", total_palindromes);
-    printf("\tEmirps found:      %12lu \n", total_emirps);
+    printf("\tConsec sq pass:    %12lu  (sent to Miller-Rabin)\n", total_consec_pass);
+    printf("\tEmirps found:      %12lu\n", total_emirps);
+    printf("\tMR tests avoided:  %12lu\n",
+           total_primes - total_palindromes - total_consec_pass);
     printf("\tElapsed time:      %12.0f seconds\n", elapsed);
     printf("==============================================================\n");
     
