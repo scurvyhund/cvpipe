@@ -13,8 +13,9 @@ STAGE3 = check_emirp_gmp
 STAGE35 = check_palindrome_gmp
 STAGE4 = check_converse_gmp
 STAGE5 = gen_candidates_range_gmp
+CVPIPE = cvpipe
 
-ALL = $(STAGE1) $(STAGE2) $(STAGE3) $(STAGE35) $(STAGE4) $(STAGE5)
+ALL = $(STAGE1) $(STAGE2) $(STAGE3) $(STAGE35) $(STAGE4) $(STAGE5) $(CVPIPE)
 
 # Default: build everything
 all: $(ALL)
@@ -28,11 +29,16 @@ all: $(ALL)
 	@echo "Stage 3:   ./$(STAGE3)"
 	@echo "Stage 3.5: ./$(STAGE35)"
 	@echo "Stage 4:   ./$(STAGE4)"
-	@echo "Stage 5:   ./$(STAGE5) <start> <end>"	
+	@echo "Stage 5:   ./$(STAGE5) <start> <end>"
+	@echo ""
+	@echo "Merged:    ./$(CVPIPE) <max_prime>"
+	@echo "           ./$(CVPIPE) <start_n> <max_prime>"
 	@echo ""
 	@echo "Or use: make test / make run / make extreme"
 	@echo "Or use: make 10e21 / make 10e22 / make 10e23 / make 10e24"
 	@echo "Or use: make continue_10e24"
+	@echo ""
+	@echo "Merged pipeline: make cvpipe-test / make cvpipe-10e20 ... cvpipe-10e25"
 	@echo "======================================================================"
 	@echo ""
 
@@ -60,6 +66,10 @@ $(STAGE4): check_converse_gmp.c
 $(STAGE5): gen_candidates_range_gmp.c
 	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 	@echo "Built: $@ (Stage 5 - Incremental Range Generator - GMP)"
+
+$(CVPIPE): cvpipe.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+	@echo "Built: $@ (Merged Pipeline - GMP)"
 
 # Quick test - small range
 test: $(ALL)
@@ -179,6 +189,44 @@ continue_10e24: $(STAGE5) $(STAGE2) $(STAGE3) $(STAGE35) $(STAGE4)
 	@echo ""
 	@echo "10^23 → 10^24 continuation complete!"
 
+# ── Merged pipeline (cvpipe) targets ──────────────────────────────────
+cvpipe-test: $(CVPIPE)
+	@echo "Running CVPipe Quick Test (max_prime = 100 million)"
+	@echo "======================================================================"
+	@./$(CVPIPE) 100000000
+	@echo ""
+	@echo "Test complete - check converse.dat and otto_primes.dat"
+
+cvpipe-10e20: $(CVPIPE)
+	@echo "CVPipe: 10^20 search"
+	@echo "======================================================================"
+	@./$(CVPIPE) 100000000000000000000
+
+cvpipe-10e21: $(CVPIPE)
+	@echo "CVPipe: 10^21 search"
+	@echo "======================================================================"
+	@./$(CVPIPE) 1000000000000000000000
+
+cvpipe-10e22: $(CVPIPE)
+	@echo "CVPipe: 10^22 search"
+	@echo "======================================================================"
+	@./$(CVPIPE) 10000000000000000000000
+
+cvpipe-10e23: $(CVPIPE)
+	@echo "CVPipe: 10^23 search"
+	@echo "======================================================================"
+	@./$(CVPIPE) 100000000000000000000000
+
+cvpipe-10e24: $(CVPIPE)
+	@echo "CVPipe: 10^24 search"
+	@echo "======================================================================"
+	@./$(CVPIPE) 1000000000000000000000000
+
+cvpipe-10e25: $(CVPIPE)
+	@echo "CVPipe: 10^25 search"
+	@echo "======================================================================"
+	@./$(CVPIPE) 10000000000000000000000000
+
 # Manual stages (for step-by-step control)
 stage1: $(STAGE1)
 	@echo "Stage 1 built. Run: ./$(STAGE1) <max_prime>"
@@ -282,4 +330,6 @@ help:
 
 .PHONY: all test run extreme 10e20 10e21 10e22 10e23 10e24 10e25 \
         continue_10e24 stage1 stage2 stage3 stage3.5 stage4 stage5 \
+        cvpipe-test cvpipe-10e20 cvpipe-10e21 cvpipe-10e22 \
+        cvpipe-10e23 cvpipe-10e24 cvpipe-10e25 \
         check-gmp info clean distclean help
