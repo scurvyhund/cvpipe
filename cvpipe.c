@@ -272,9 +272,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    /* max_n = sqrt(max_prime / 2) */
-    mpz_fdiv_q_ui(temp, max_prime_z, 2);
-    mpz_sqrt(max_n_z, temp);
+    /* Convert max_prime to max_n using inverse formula */
+    prime_to_n(max_n_z, max_prime_z);
     uint64_t max_n = mpz_get_ui(max_n_z);
 
     /* ── Compute search zones ─────────────────────────────────────── */
