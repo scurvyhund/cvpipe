@@ -7,7 +7,16 @@
       "Bash(python3:*)",
       "Bash(gcc:*)",
       "Bash(./verify_consec_sq:*)",
-      "Bash(./filter_primes_gmp:*)"
+      "Bash(./filter_primes_gmp:*)",
+      "Bash(make:*)",
+      "Bash(./cvpipe:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(/home/jim/programming/c/BigFermat/gmp-cvo/cvpipe 707106781186 10000000000000000000000000)",
+      "Bash(TZ=/tmp/claude-1000/-home-jim-programming-c-BigFermat-gmp-cvo/af376a24-41ff-4243-9e16-d7fb774c31d1/scratchpad/test_zones)",
+      "Bash($TZ 1000000000000000000000000 10000000000000000000000000)",
+      "Bash($TZ 100000000000000000000000 1000000000000000000000000)",
+      "Bash(git remote add:*)"
     ]
   }
 }

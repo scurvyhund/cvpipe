@@ -1,4 +1,4 @@
-/* cvpipe.c — Merged CVPipe: Con-verse Prime Pipeline (single-pass, no disk I/O)
+/* cvpipe.c — Merged CVPipe: Converse Prime Pipeline (single-pass, no disk I/O)
  *
  * Combines all 5 stages into one in-memory pipeline:
  *   Stage 1: Generate candidates (2n² + 2n + 1)
@@ -11,7 +11,8 @@
  *   ./cvpipe <max_prime>              Full run from n=0
  *   ./cvpipe <start_n> <max_prime>    Continue from start_n
  *
- * Compile: gcc -O3 -march=znver2 -mtune=znver2 -fopenmp -Wall cvpipe.c -o cvpipe -lgmp
+ * Compile: gcc -O3 -march=znver2 -mtune=znver2 -fopenmp -Wall cvpipe.c -o 
+ *              cvpipe -lgmp
  */
 
 #include <stdio.h>
@@ -26,9 +27,9 @@
 #define NUM_THREADS 16
 #define MR_ROUNDS 25
 #define PROGRESS_INTERVAL 10000000  /* Thread 0 reports every 10M n-values */
-#define MAX_ZONES 64
+#define MAX_ZONES 256
 
-/* ── Zone-skip: only iterate n-ranges where candidates have valid first-2 digits ── */
+/* ── Zone-skip: only iter-range if candidates have valid first-2 digits ── */
 typedef struct {
     uint64_t n_min;
     uint64_t n_max;
@@ -66,7 +67,9 @@ static int count_digits_gmp(mpz_t num) {
 /* Compute valid search zones for [prime_min, prime_max].
  * Returns the number of zones stored in zones[].
  */
-static int compute_zones(search_zone_t *zones, mpz_t prime_min, mpz_t prime_max) {
+static int compute_zones(search_zone_t *zones, mpz_t prime_min, 
+                         mpz_t prime_max) {
+
     int d_min = count_digits_gmp(prime_min);
     int d_max = count_digits_gmp(prime_max);
     int zone_count = 0;
@@ -74,8 +77,8 @@ static int compute_zones(search_zone_t *zones, mpz_t prime_min, mpz_t prime_max)
     /* Patterns require at least 2 digits (d >= 2 for 10^(d-2) to be valid) */
     if (d_min < 2) d_min = 2;
 
-    mpz_t power_of_10, p_zone_min, p_zone_max, p_min, p_max, n_min_z, n_max_z;
-    mpz_init(power_of_10);
+    mpz_t pwr_of_10, p_zone_min, p_zone_max, p_min, p_max, n_min_z, n_max_z;
+    mpz_init(pwr_of_10);
     mpz_init(p_zone_min);
     mpz_init(p_zone_max);
     mpz_init(p_min);
@@ -84,20 +87,22 @@ static int compute_zones(search_zone_t *zones, mpz_t prime_min, mpz_t prime_max)
     mpz_init(n_max_z);
 
     for (int d = d_min; d <= d_max; d++) {
-        mpz_ui_pow_ui(power_of_10, 10, (unsigned long)(d - 2));
+        mpz_ui_pow_ui(pwr_of_10, 10, (unsigned long)(d - 2));
 
         for (int i = 0; i < NUM_PATTERNS && zone_count < MAX_ZONES; i++) {
             int pattern = VALID_PATTERNS[i];
 
             /* prime sub-range for this pattern at d digits:
              * [pattern * 10^(d-2), (pattern+1) * 10^(d-2) - 1] */
-            mpz_mul_ui(p_zone_min, power_of_10, pattern);
-            mpz_mul_ui(p_zone_max, power_of_10, pattern + 1);
+            mpz_mul_ui(p_zone_min, pwr_of_10, pattern);
+            mpz_mul_ui(p_zone_max, pwr_of_10, pattern + 1);
             mpz_sub_ui(p_zone_max, p_zone_max, 1);
 
             /* intersect with user range */
-            mpz_set(p_min, mpz_cmp(p_zone_min, prime_min) < 0 ? prime_min : p_zone_min);
-            mpz_set(p_max, mpz_cmp(p_zone_max, prime_max) > 0 ? prime_max : p_zone_max);
+            mpz_set(p_min, mpz_cmp(p_zone_min, prime_min) < 0 ? 
+                    prime_min : p_zone_min);
+            mpz_set(p_max, mpz_cmp(p_zone_max, prime_max) > 0 ? 
+                    prime_max : p_zone_max);
 
             if (mpz_cmp(p_min, p_max) > 0)
                 continue;
@@ -113,13 +118,17 @@ static int compute_zones(search_zone_t *zones, mpz_t prime_min, mpz_t prime_max)
         }
     }
 
-    mpz_clear(power_of_10);
+    mpz_clear(pwr_of_10);
     mpz_clear(p_zone_min);
     mpz_clear(p_zone_max);
     mpz_clear(p_min);
     mpz_clear(p_max);
     mpz_clear(n_min_z);
     mpz_clear(n_max_z);
+
+    if (zone_count >= MAX_ZONES)
+        fprintf(stderr, "WARNING: zone count hit MAX_ZONES=%d cap — results\
+                may be incomplete!\n", MAX_ZONES);
 
     return zone_count;
 }
@@ -184,7 +193,7 @@ static bool is_consec_sq_sum(mpz_t p, mpz_t disc) {
 /* ── Reverse a decimal string in-place into caller's buffer ──────────
  * From check_emirp_gmp.c:43-52 (adapted: caller provides buffer)
  */
-static void reverse_string(const char *str, int len, char *out) {
+static void rev_string(const char *str, int len, char *out) {
     for (int i = 0; i < len; i++)
         out[i] = str[len - 1 - i];
     out[len] = '\0';
@@ -201,11 +210,11 @@ static bool is_palindrome_str(const char *str, int len) {
     return true;
 }
 
-/* ── Solve n² + (n+1)² = p for n ─────────────────────────────────────
+/* ── Solve n^2 + (n+1) = p for n ─────────────────────────────────────
  * n = (-1 + sqrt(2p - 1)) / 2; returns true if n is a non-negative integer.
  * From check_converse_gmp.c:24-66
  */
-static bool solve_consecutive_squares(mpz_t p, mpz_t n_out, mpz_t disc) {
+static bool solve_consec_sqr(mpz_t p, mpz_t n_out, mpz_t disc) {
     /* disc = 2p - 1 */
     mpz_mul_ui(disc, p, 2);
     mpz_sub_ui(disc, disc, 1);
@@ -283,8 +292,8 @@ int main(int argc, char *argv[]) {
     {
         mpz_t sn;
         mpz_init_set_ui(sn, start_n);
-        mpz_mul(start_prime_z, sn, sn);        /* sn² */
-        mpz_mul_ui(start_prime_z, start_prime_z, 2); /* 2sn² */
+        mpz_mul(start_prime_z, sn, sn);        /* sn^2 */
+        mpz_mul_ui(start_prime_z, start_prime_z, 2); /* 2sn^2 */
         mpz_addmul_ui(start_prime_z, sn, 2);   /* + 2sn */
         mpz_add_ui(start_prime_z, start_prime_z, 1); /* + 1 */
         mpz_clear(sn);
@@ -377,10 +386,10 @@ int main(int argc, char *argv[]) {
         thread_stats_t st = {0};
 
         /* Per-thread GMP variables */
-        mpz_t n_z, candidate, reversed_num, disc, n1_out, n2_out;
+        mpz_t n_z, candidate, rev_num, disc, n1_out, n2_out;
         mpz_init(n_z);
         mpz_init(candidate);
-        mpz_init(reversed_num);
+        mpz_init(rev_num);
         mpz_init(disc);
         mpz_init(n1_out);
         mpz_init(n2_out);
@@ -402,9 +411,9 @@ int main(int argc, char *argv[]) {
 
             for (uint64_t n = first_n; n <= zone_end; n += NUM_THREADS) {
 
-                /* ── Step 1: Compute p = 2n² + 2n + 1 ─────────────── */
+                /* ── Step 1: Compute p = 2n^2 + 2n + 1 ─────────────── */
                 mpz_set_ui(n_z, n);
-                mpz_mul(candidate, n_z, n_z);           /* n² */
+                mpz_mul(candidate, n_z, n_z);           /* n^2 */
                 mpz_mul_ui(candidate, candidate, 2);     /* 2n² */
                 mpz_addmul_ui(candidate, n_z, 2);        /* + 2n */
                 mpz_add_ui(candidate, candidate, 1);      /* + 1 */
@@ -427,11 +436,14 @@ int main(int argc, char *argv[]) {
                     if (mpz_probab_prime_p(candidate, MR_ROUNDS) > 0) {
                         st.primes_found++;
                         /* Solve for n to format output */
-                        if (solve_consecutive_squares(candidate, n1_out, disc)) {
+                        if (solve_consec_sqr(candidate, n1_out, disc)) {
                             st.otto_found++;
+                            
                             #pragma omp critical(otto_write)
                             {
-                                gmp_fprintf(fp_otto, "%Zd %Zd\n", candidate, n1_out);
+                                gmp_fprintf(fp_otto, "%Zd %Zd\n", candidate,
+                                            n1_out);
+
                                 fflush(fp_otto);
                             }
                         }
@@ -440,11 +452,11 @@ int main(int argc, char *argv[]) {
                 }
 
                 /* ── Step 5: Reverse digits ────────────────────────── */
-                reverse_string(cand_str, len, rev_str);
+                rev_string(cand_str, len, rev_str);
 
                 /* ── Step 6: is_consec_sq_sum on reversed? ─────────── */
-                mpz_set_str(reversed_num, rev_str, 10);
-                if (!is_consec_sq_sum(reversed_num, disc))
+                mpz_set_str(rev_num, rev_str, 10);
+                if (!is_consec_sq_sum(rev_num, disc))
                     continue;
                 st.consec_sq_passed++;
 
@@ -456,39 +468,43 @@ int main(int argc, char *argv[]) {
 
                 /* ── Step 8: MR on r ───────────────────────────────── */
                 st.mr_tests++;
-                if (mpz_probab_prime_p(reversed_num, MR_ROUNDS) <= 0)
+                if (mpz_probab_prime_p(rev_num, MR_ROUNDS) <= 0)
                     continue;
                 st.emirps_found++;
 
                 /* ── Step 9: Solve consecutive squares for both ────── */
-                bool p_ok = solve_consecutive_squares(candidate, n1_out, disc);
-                bool r_ok = solve_consecutive_squares(reversed_num, n2_out, disc);
+                bool p_ok = solve_consec_sqr(candidate, n1_out, disc);
+                bool r_ok = solve_consec_sqr(rev_num, n2_out, disc);
 
                 if (p_ok && r_ok) {
                     /* Dedup: only write if p <= r */
-                    if (mpz_cmp(candidate, reversed_num) <= 0) {
+                    if (mpz_cmp(candidate, rev_num) <= 0) {
                         st.converse_found++;
                         #pragma omp critical(converse_write)
                         {
                             gmp_fprintf(fp_converse, "%Zd %Zd %Zd %Zd\n",
-                                        candidate, reversed_num, n1_out, n2_out);
+                                        candidate, rev_num, n1_out, n2_out);
                             fflush(fp_converse);
                             gmp_printf("\n  *** CON-VERSE PAIR FOUND ***\n");
-                            gmp_printf("  %Zd <==> %Zd\n", candidate, reversed_num);
+                            gmp_printf("  %Zd <==> %Zd\n", candidate, rev_num);
                             gmp_printf("  %Zd = %Zd^2 + (%Zd+1)^2\n",
                                        candidate, n1_out, n1_out);
                             gmp_printf("  %Zd = %Zd^2 + (%Zd+1)^2\n\n",
-                                       reversed_num, n2_out, n2_out);
+                                       rev_num, n2_out, n2_out);
                         }
                     }
                 }
 
                 /* ── Progress reporting (thread 0 only) ────────────── */
-                if (tid == 0 && st.candidates_generated % PROGRESS_INTERVAL == 0) {
+                if (tid == 0 && st.candidates_generated % 
+                    PROGRESS_INTERVAL == 0) {
+
                     double elapsed = omp_get_wtime() - omp_start;
-                    printf("  [%6.1fs] zone=%d/%d  n=%lu  gate=%lu  consec_sq=%lu  mr=%lu\n",
-                           elapsed, z + 1, num_zones, n,
-                           st.gatekeeper_passed, st.consec_sq_passed, st.mr_tests);
+                    printf("  [%6.1fs] zone=%d/%d  n=%lu  gate=%lu\
+                          consec_sq=%lu  mr=%lu\n", elapsed, z + 1, num_zones,
+                          n, st.gatekeeper_passed, st.consec_sq_passed,
+                          st.mr_tests);
+
                     fflush(stdout);
                 }
             }
@@ -507,7 +523,7 @@ int main(int argc, char *argv[]) {
 
         mpz_clear(n_z);
         mpz_clear(candidate);
-        mpz_clear(reversed_num);
+        mpz_clear(rev_num);
         mpz_clear(disc);
         mpz_clear(n1_out);
         mpz_clear(n2_out);
@@ -520,7 +536,7 @@ int main(int argc, char *argv[]) {
     time_t wall_end = time(NULL);
 
     /* ── Summary ───────────────────────────────────────────────────── */
-    printf("\n==============================================================\n");
+    printf("\n============================================================\n");
     printf("  CVPipe COMPLETE\n");
     printf("==============================================================\n");
     printf("  Search zones:          %12d\n", num_zones);
@@ -528,7 +544,7 @@ int main(int argc, char *argv[]) {
     printf("  Naive n-values:        %12lu\n", naive_total);
     if (total_zone_n > 0 && naive_total > 0)
         printf("  Zone skip:             %11.1fx\n",
-               (double)naive_total / total_zone_n);
+              (double)naive_total / total_zone_n);
     printf("  Candidates generated:  %12lu\n", g_candidates);
     printf("  Gatekeeper passed:     %12lu\n", g_gatekeeper);
     printf("  Palindromes found:     %12lu\n", g_palindromes);
@@ -538,21 +554,22 @@ int main(int argc, char *argv[]) {
     printf("  Emirps found:          %12lu\n", g_emirps);
     printf("  CON-VERSE pairs:       %12lu\n", g_converse);
     printf("  Otto primes:           %12lu\n", g_otto);
-    printf("  Wall time:             %12.1f seconds\n", difftime(wall_end, wall_start));
+    printf("  Wall time:             %12.1f seconds\n", difftime(wall_end, 
+           wall_start));
     printf("  CPU time:              %12.1f seconds\n", elapsed);
     printf("==============================================================\n");
 
     if (g_converse == 1) {
         printf("\n  EXACTLY ONE CON-VERSE PAIR FOUND!\n");
         printf("  This may be the only con-verse prime pair!\n");
-        printf("==============================================================\n");
+        printf("==========================================================\n");
     } else if (g_converse == 0) {
         printf("\n  No con-verse pairs found in this range.\n");
-        printf("==============================================================\n");
+        printf("==========================================================\n");
     } else {
         printf("\n  MULTIPLE CON-VERSE PAIRS FOUND!\n");
         printf("  This is a significant discovery!\n");
-        printf("==============================================================\n");
+        printf("==========================================================\n");
     }
 
     return 0;
