@@ -1,104 +1,4 @@
 /*
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
-*
  * verify_consec_sq.c
  *
  * Verify if a number p is a sum of consecutive squares: p = n² + (n+1)²
@@ -179,7 +79,8 @@ int main(int argc, char *argv[]) {
     mpz_init(n);
     mpz_init(verify);
 
-    uint8_t i = 1;
+    bool ret_value = 0;
+    
     while(true) {
 
         // Parse input
@@ -197,16 +98,13 @@ int main(int argc, char *argv[]) {
         gmp_printf("Input:  %Zd\n", p);
         printf("\n");
     
-        // Check p mod 4
+        // Check p mod 4...
         unsigned long mod4 = mpz_fdiv_ui(p, 4);
         printf("p mod 4 = %lu", mod4);
+       
+        ret_value = (mod4 != 1) || printf("ERROR: (must be 1 for consecutive squares)\n");
+        printf("\nret_val: %d\n", ret_value);
 
-        if (mod4 == 1) {
-           printf("   ERROR: (required for consecutive squares)\n");
-        } else {
-            printf("  ERROR: (must be 1 for consecutive squares)\n");
-        }
-    
         // Check primality
         int prime_result = mpz_probab_prime_p(p, MR_ROUNDS);
         printf("Prime?    ");
@@ -214,20 +112,22 @@ int main(int argc, char *argv[]) {
         if (prime_result == 2) {
             printf("YES (definitely prime)\n");
         } else if (prime_result == 1) {
-            printf("YES (probably prime, %d rounds Miller-Rabin)\n", MR_ROUNDS);
+            printf("YES (probably prime, %d rounds Miller-Rabin)\n",\
+            MR_ROUNDS);
         } else {
             printf("NO (composite)\n");
         }
     
-        // Check consecutive squares
         printf("\n");
+        
+        // Check consecutive squares...
         if (solve_consecutive_squares(p, n)) {
             printf("Consecutive square sum: YES\n");
             printf("\n");
             gmp_printf("  n = %Zd\n", n);
             printf("\n");
     
-            // Verify by computing n² + (n+1)^2
+            // Verify by computing n^2 + (n+1)^2
             mpz_t n_plus_1;
             mpz_init(n_plus_1);
             mpz_add_ui(n_plus_1, n, 1);
@@ -241,12 +141,15 @@ int main(int argc, char *argv[]) {
             printf("\n");
             if (mpz_cmp(verify, p) == 0) {
                 printf("  Verification: CONFIRMED\n");
+                return 0;
             } else {
                 printf("  Verification: ERROR: MISMATCH (this should never happen)\n");
+                return 1;
             }
         } else {
             printf("Consecutive square sum: NO\n");
             printf("  This number cannot be expressed as n^2 + (n+1)^2\n");
+            return 2;
         }
     }
 

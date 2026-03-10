@@ -1,0 +1,23 @@
+# One-liners for background runs:
+
+# 10^21 (~10 hours)
+nohup time make 10e21 > run_10e21.log 2>&1 &
+
+# 10^22 (~1 hour - you did this!)  
+nohup time make 10e22 > run_10e22.log 2>&1 &
+
+# 10^23 (~9 hours - running now?)
+nohup time make 10e23 > run_10e23.log 2>&1 &
+
+# 10^24 (~4 days)
+nohup time make 10e24 > run_10e24.log 2>&1 &
+
+
+# Now run 10^23 properly
+nohup time make 10e23 > run_10e23.log 2>&1 &
+
+# Check progress
+tail -f run_10e23.log
+
+# Or check if it's running
+ps aux | grep generate_candidates

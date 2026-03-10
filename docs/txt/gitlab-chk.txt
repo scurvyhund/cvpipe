@@ -1,0 +1,3 @@
+git log --format='%ae' | sort -u
+find . -name '*.log' -o -name '*.dat' -o -name '*.out'
+

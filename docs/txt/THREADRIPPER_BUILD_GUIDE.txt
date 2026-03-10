@@ -1,0 +1,817 @@
+THREADRIPPER 3960X BUILD GUIDE FOR PRIME HUNTING
+======================================================================
+Optimized for CVPipe: Multi-threaded GMP computation
+Target: 24-core sustained compute workload
+Budget: ~$1800-2400 per system
+
+TABLE OF CONTENTS
+======================================================================
+1. Parts List with Rationale
+2. Sourcing Strategy (Used vs New)
+3. Assembly Guide
+4. BIOS Configuration
+5. Linux Installation & Optimization
+6. Benchmarking & Validation
+7. Two-System Strategy
+8. Troubleshooting
+
+
+SECTION 1: PARTS LIST WITH RATIONALE
+======================================================================
+
+CPU: AMD Threadripper 3960X (24 cores / 48 threads)
+----------------------------------------------------------------------
+Price: $500-700 used, $1400+ new (if you can find it)
+Why this one:
+  ✓ 24 cores = perfect for 16-thread pipeline + headroom
+  ✓ 3.8 GHz base, 4.5 GHz boost (good single-thread too)
+  ✓ 128 PCIe lanes (overkill but future-proof)
+  ✓ Zen 2 architecture (same as your Ryzen 4700U)
+  ✓ TDP: 280W (manageable cooling)
+
+Alternative considerations:
+  • 3970X (32 cores): +$400, only 33% faster for your workload
+  • 3990X (64 cores): +$1000, overkill unless running 2+ searches
+  • 5000-series TR: Hard to find, expensive, minimal benefit
+
+Verdict: 3960X is the sweet spot
+
+MOTHERBOARD: TRX40 Platform
+----------------------------------------------------------------------
+Price: $300-500 used, $600-1000 new
+
+Recommended models (in order):
+1. ASUS Pro WS TRX40-Sage WiFi ($400-600 used)
+   ✓ Rock-solid, best VRM
+   ✓ 8x DIMM slots (256GB max)
+   ✓ Multiple M.2 slots
+   ✓ Excellent Linux support
+
+2. Gigabyte TRX40 Aorus Master ($300-500 used)
+   ✓ Good VRM, solid build
+   ✓ 8x DIMM slots
+   ✓ Slightly cheaper
+
+3. ASRock TRX40 Creator ($300-400 used)
+   ✓ Budget option, still good
+   ✓ 8x DIMM slots
+   ✓ Thunderbolt (not needed, but nice)
+
+Avoid:
+  • TRX40 Designare (overpriced for features you won't use)
+  • Any board with less than 8 DIMM slots
+
+Features that DON'T matter for you:
+  ✗ WiFi/Bluetooth (ethernet is better anyway)
+  ✗ RGB lighting (just glows in the basement)
+  ✗ Multi-GPU support (no GPU needed)
+  ✗ Thunderbolt (nice but unnecessary)
+
+Features that DO matter:
+  ✓ Good VRM (sustained 24-core load)
+  ✓ 8 DIMM slots (128GB+ capacity)
+  ✓ Multiple M.2 slots (fast storage for .dat files)
+  ✓ Solid Linux compatibility
+
+RAM: 128GB DDR4 (4x32GB)
+----------------------------------------------------------------------
+Price: $300-450 (used/new similar)
+
+Recommended specs:
+  • Speed: 3200 MHz (good balance)
+  • Timings: CL16 or CL18 (doesn't matter much)
+  • ECC: Optional (not needed but nice for data integrity)
+
+Good brands:
+  • Crucial/Micron
+  • G.Skill Ripjaws V
+  • Corsair Vengeance LPX
+  • Kingston Fury
+
+Configuration:
+  • 4x32GB = 128GB (plenty for prime hunting)
+  • Populate slots A2, B2, C2, D2 for quad-channel
+  • Can upgrade to 256GB later if needed
+
+Why 128GB?
+  ✓ Your current run used <1GB
+  ✓ GMP is memory-efficient
+  ✓ Leaves headroom for buffering
+  ✓ Can run multiple searches simultaneously
+  ✓ Overkill is fun!
+
+Alternative: Start with 64GB (2x32GB) for $150-200, upgrade later
+
+STORAGE: 2TB NVMe SSD
+----------------------------------------------------------------------
+Price: $100-150
+
+Your .dat files get BIG:
+  • 10^20 run: ~20GB total
+  • 10^24 run: ~200GB total
+  • Multiple runs + logs: 500GB-1TB
+
+Recommended:
+  • Samsung 970 EVO Plus 2TB ($100-120 used)
+  • WD Black SN850 2TB ($130-150)
+  • Crucial P3 Plus 2TB ($100)
+
+Don't need:
+  • Gen4/Gen5 NVMe (Gen3 is plenty fast)
+  • RAID (just backup to external)
+  • Spinny rust (too slow for lots of file I/O)
+
+Optional: Add 4TB HDD for archives ($80)
+
+COOLING: Noctua NH-U14S TR4-SP3
+----------------------------------------------------------------------
+Price: $100-120
+
+Why this cooler:
+  ✓ Designed for Threadripper
+  ✓ Handles 280W sustained load
+  ✓ Quiet (important for 24/7 operation)
+  ✓ Reliable (Noctua quality)
+  ✓ No pump to fail (air cooling)
+
+Installation notes:
+  • Uses special TR4 mounting
+  • Comes with bracket/backplate
+  • Takes up lots of space (check case clearance)
+  • Top-down airflow (exhausts rear)
+
+Alternative: AIO liquid cooler
+  • Arctic Liquid Freezer II 280mm ($100-120)
+  • Quieter under sustained load
+  • More complex installation
+  • Pump could fail (rare but possible)
+
+For sustained 24-core loads: Either works, Noctua is simpler
+
+POWER SUPPLY: 850W 80+ Gold
+----------------------------------------------------------------------
+Price: $100-150
+
+Power requirements:
+  • CPU: 280W (sustained)
+  • Motherboard: 50W
+  • RAM: 40W
+  • SSD: 10W
+  • Fans: 20W
+  • Total: ~400W
+  • Headroom: 850W is perfect
+
+Recommended:
+  • EVGA SuperNOVA 850 G6 ($120-140)
+  • Corsair RM850x ($130-150)
+  • Seasonic Focus GX-850 ($120-140)
+
+Must have:
+  ✓ 80+ Gold (efficiency matters for 24/7)
+  ✓ Modular cables (cleaner build)
+  ✓ 10-year warranty
+
+Don't overpay for:
+  • 80+ Platinum/Titanium (tiny difference)
+  • 1000W+ (overkill, less efficient at low load)
+
+CASE: Any ATX Mid/Full Tower
+----------------------------------------------------------------------
+Price: $80-150
+
+Requirements:
+  ✓ EATX motherboard support (TRX40 boards are BIG)
+  ✓ Good airflow (sustained load = heat)
+  ✓ Space for big cooler (180mm+ clearance)
+  ✓ 2-3 fans included
+
+Good options:
+  • Fractal Design Meshify 2 XL ($150)
+  • Lian Li O11 Dynamic EVO ($140)
+  • Phanteks Enthoo Pro 2 ($130)
+  • Fractal Define 7 XL ($170) - if you want QUIET
+
+Budget option:
+  • Corsair 4000D Airflow ($100)
+  • Be Quiet Pure Base 500DX ($110)
+
+What you DON'T need:
+  ✗ Tempered glass (can't see it under desk)
+  ✗ RGB fans (waste of money)
+  ✗ Cable management obsession (it's going in basement)
+
+What you DO need:
+  ✓ Fits EATX board
+  ✓ Good airflow
+  ✓ Enough space
+
+NO GPU NEEDED
+----------------------------------------------------------------------
+Price: $0
+
+Your workload:
+  • CPU-only (GMP doesn't use GPU)
+  • No gaming
+  • No display rendering
+  • Headless operation
+
+Use motherboard HDMI/DisplayPort for initial setup, then:
+  • SSH from your main computer
+  • No monitor needed
+  • Save $300+ on GPU
+
+Optional: $30 cheap GPU for troubleshooting (GT710)
+
+
+TOTAL COST BREAKDOWN
+======================================================================
+
+CONSERVATIVE (Used/Budget):
+----------------------------------------------------------------------
+CPU:        $500  (3960X used)
+Mobo:       $350  (TRX40 used)
+RAM:        $300  (128GB DDR4)
+SSD:        $100  (2TB NVMe)
+Cooler:     $100  (Noctua NH-U14S)
+PSU:        $120  (850W Gold)
+Case:       $100  (Basic ATX)
+---------
+Total:     $1570
+
+RECOMMENDED (Mix of Used/New):
+----------------------------------------------------------------------
+CPU:        $650  (3960X used, good condition)
+Mobo:       $450  (ASUS TRX40 used)
+RAM:        $350  (128GB 3200MHz)
+SSD:        $120  (Samsung 970 EVO 2TB)
+Cooler:     $110  (Noctua NH-U14S)
+PSU:        $140  (EVGA 850 G6)
+Case:       $130  (Fractal Meshify 2 XL)
+---------
+Total:     $1950
+
+PREMIUM (Best components):
+----------------------------------------------------------------------
+CPU:        $700  (3960X excellent condition)
+Mobo:       $550  (ASUS Pro WS like-new)
+RAM:        $400  (128GB 3600MHz CL16)
+SSD:        $150  (WD Black SN850 2TB)
+Cooler:     $120  (Arctic AIO 280mm)
+PSU:        $150  (Corsair RM850x)
+Case:       $170  (Fractal Define 7 XL)
+---------
+Total:     $2240
+
+
+SECTION 2: SOURCING STRATEGY
+======================================================================
+
+WHERE TO BUY USED (Best value)
+----------------------------------------------------------------------
+
+eBay:
+  ✓ Tons of decommissioned workstations
+  ✓ Look for "seller refurbished" or "open box"
+  ✓ Check seller ratings (98%+)
+  ✓ PayPal protection
+  ✓ Filter by "accepts returns"
+
+r/hardwareswap (Reddit):
+  ✓ Enthusiast market
+  ✓ Often better prices than eBay
+  ✓ Can negotiate
+  ✓ PayPal G&S for protection
+  ✓ Check user trade history
+
+r/homelabsales (Reddit):
+  ✓ Server/workstation focus
+  ✓ Knowledgeable sellers
+  ✓ Good deals on enterprise gear
+
+Local (Craigslist/Facebook Marketplace):
+  ✓ No shipping risk
+  ✓ Can test before buying
+  ✓ Negotiate in person
+
+Enterprise resellers:
+  • ServerMonkey.com
+  • TechMikeNY
+  • Aventis Systems
+  ✓ Tested/warranted
+  ✓ More expensive but safer
+
+WHERE TO BUY NEW
+----------------------------------------------------------------------
+
+For peace of mind:
+  • Newegg (CPUs, mobos)
+  • Amazon (everything)
+  • B&H Photo (good customer service)
+  • Microcenter (if near you - BEST for testing/returns)
+
+WHAT TO BUY USED vs NEW
+----------------------------------------------------------------------
+
+SAFE to buy used:
+  ✓ CPU (very reliable, rarely fails)
+  ✓ Motherboard (if tested, 30-day return)
+  ✓ Case (can't really break)
+  ✓ Cooler (metal doesn't wear out)
+
+RISKY to buy used:
+  ? PSU (may have degraded caps)
+  ? RAM (test thoroughly)
+
+BUY NEW:
+  ✓ SSD (wear matters, warranty matters)
+  ✓ PSU (10-year warranty worth it)
+
+TESTING USED PARTS
+----------------------------------------------------------------------
+
+CPU:
+  • Look for: Clean pins, no bent corners
+  • Test: Boot, run stress test for 1 hour
+  • Warranty: Check if transferable (AMD is)
+
+Motherboard:
+  • Look for: No blown caps, clean PCB
+  • Test: All RAM slots, all M.2 slots, POST
+  • Return policy: Insist on 30 days minimum
+
+RAM:
+  • Test: memtest86+ for 4+ hours
+  • Return if: ANY errors
+
+RED FLAGS (walk away):
+  ✗ "Sold as-is, no returns"
+  ✗ No clear photos
+  ✗ "Never tested" or "for parts"
+  ✗ Water damage visible
+  ✗ Seller has negative feedback about DOA items
+
+
+SECTION 3: ASSEMBLY GUIDE
+======================================================================
+
+TOOLS NEEDED
+----------------------------------------------------------------------
+• Phillips screwdriver (magnetic tip helps)
+• Thermal paste (Noctua NT-H1 or Arctic MX-5)
+• Cable ties
+• Anti-static wrist strap (optional but recommended)
+• Flashlight (case interiors are dark)
+• Patience
+
+WORKSPACE
+----------------------------------------------------------------------
+• Clean, flat surface
+• Good lighting
+• Anti-static mat or cardboard (not carpet!)
+• Keep motherboard box for initial build/testing
+
+BUILD ORDER (Do it RIGHT)
+----------------------------------------------------------------------
+
+STEP 1: Unbox and inventory
+  □ Check all parts received
+  □ Read motherboard manual (seriously!)
+  □ Identify all cables, screws, standoffs
+
+STEP 2: Install CPU (OUTSIDE case)
+  □ Place motherboard on box/mat
+  □ Release CPU socket lever
+  □ Align CPU triangle with socket triangle
+  □ Drop CPU in (NEVER force it!)
+  □ Close lever (may require moderate force)
+  □ Inspect: CPU should sit flat, pins not visible
+
+STEP 3: Install RAM (OUTSIDE case)
+  □ Check manual for slot population order
+  □ Usually: A2, B2, C2, D2 (2nd slot of each channel)
+  □ Open clips on both sides of slot
+  □ Align RAM notch with socket key
+  □ Press down firmly until clips snap closed
+  □ RAM should be level, fully seated
+
+STEP 4: Install M.2 SSD (OUTSIDE case)
+  □ Locate M.2 slot (usually near CPU)
+  □ Remove heatsink if present
+  □ Insert SSD at 30° angle
+  □ Press down flat
+  □ Screw in standoff
+  □ Replace heatsink
+
+STEP 5: Test POST (BEFORE case installation)
+  □ Connect 24-pin ATX power
+  □ Connect 8-pin CPU power
+  □ Connect monitor to motherboard video out
+  □ Connect keyboard
+  □ SHORT power pins with screwdriver (or use button if board has one)
+  □ System should POST (display BIOS screen)
+  □ Enter BIOS, verify:
+    - CPU detected (should show 3960X)
+    - All RAM detected (should show 128GB)
+    - SSD detected
+  □ Shutdown (hold power pins short)
+
+  If no POST:
+    - Check RAM fully seated (reseat firmly)
+    - Check CPU power cable connected
+    - Check monitor cable in motherboard (not GPU slot)
+    - Clear CMOS (jumper or button)
+
+STEP 6: Install motherboard in case
+  □ Install I/O shield (snaps in from inside)
+  □ Install standoffs in case (match motherboard holes)
+  □ Carefully place motherboard (align I/O shield)
+  □ Screw in motherboard (don't overtighten!)
+  □ All screws should be in, check for loose standoffs
+
+STEP 7: Install cooler
+  □ Remove plastic cover from CPU
+  □ Apply thermal paste (pea-sized dot in center)
+  □ Mount Noctua TR4 backplate (see manual!)
+  □ Place cooler on CPU
+  □ Screw down in X pattern (little at a time)
+  □ Connect fan to CPU_FAN header
+  □ Connect pump if AIO
+
+STEP 8: Install PSU
+  □ Place PSU in case (fan facing DOWN if bottom vent exists)
+  □ Screw in 4 corners
+  □ Route cables behind motherboard tray
+
+STEP 9: Connect all cables
+  □ 24-pin ATX to motherboard
+  □ 8-pin (4+4) CPU power to motherboard
+  □ SATA power to... nothing (no drives!)
+  □ Front panel headers (power, reset, LEDs) - see manual!
+  □ Case fans to motherboard or PSU
+
+STEP 10: Cable management
+  □ Route cables behind motherboard
+  □ Use velcro ties (reusable)
+  □ Airflow > aesthetics
+  □ Just make it not terrible
+
+STEP 11: Final POST
+  □ Connect monitor, keyboard
+  □ Power on
+  □ Should POST immediately
+  □ Enter BIOS
+
+
+SECTION 4: BIOS CONFIGURATION
+======================================================================
+
+CRITICAL SETTINGS FOR PRIME HUNTING
+----------------------------------------------------------------------
+
+Boot into BIOS (usually DEL or F2 key during POST)
+
+1. ENABLE XMP/DOCP (RAM speed)
+----------------------------------------------------------------------
+   AI Tweaker / Extreme Tweaker → DOCP/XMP Profile 1
+   This sets RAM to rated speed (3200MHz)
+
+2. SET CPU TO ALL-CORE PERFORMANCE
+----------------------------------------------------------------------
+   Advanced → AMD CBS → SMU Common Options
+   → Performance → Disable Precision Boost Overdrive
+   → Set all cores to base clock (3.8 GHz)
+   
+   Why? Consistent performance, lower temps, 24/7 stable
+
+3. DISABLE UNNECESSARY FEATURES
+----------------------------------------------------------------------
+   Advanced → AMD CBS → NBIO Common Options
+   → Disable Onboard graphics (if option exists)
+   
+   Advanced → Onboard Devices Configuration
+   → Disable HD Audio (no sound needed)
+   → Disable WiFi/Bluetooth
+   
+   Boot → Disable Fast Boot (better for Linux)
+
+4. ENABLE VIRTUALIZATION (optional, for future)
+----------------------------------------------------------------------
+   Advanced → CPU Configuration → SVM Mode = Enabled
+   (Allows VMs, Docker, etc.)
+
+5. SET FAN CURVES
+----------------------------------------------------------------------
+   Monitor → Fan Control
+   → CPU Fan: Ramp from 40% at 50°C to 100% at 80°C
+   → Case Fans: Constant 60% (quiet enough, good airflow)
+
+6. SAVE & EXIT
+----------------------------------------------------------------------
+   Save changes and reboot
+
+
+SECTION 5: LINUX INSTALLATION & OPTIMIZATION
+======================================================================
+
+RECOMMENDED DISTRO: Fedora Workstation (or your preference)
+----------------------------------------------------------------------
+Why Fedora:
+  ✓ Up-to-date kernel (good TR support)
+  ✓ You're already using it
+  ✓ GCC/GMP in repos
+  ✓ Works out of the box
+
+Alternatives: Ubuntu 24.04, Debian 12, Arch (if you're brave)
+
+INSTALLATION
+----------------------------------------------------------------------
+
+1. Create USB installer
+   - Download Fedora ISO
+   - Use Fedora Media Writer or dd
+   - Boot from USB (F11 or F12 during POST)
+
+2. Install Fedora
+   - Default options are fine
+   - Partition: Use entire disk, LVM
+   - Create user account
+   - Set hostname: threadripper01 (or whatever)
+
+3. First boot updates
+   sudo dnf update -y
+   sudo dnf install gcc gcc-c++ gmp-devel make vim git htop -y
+
+4. Verify CPU detection
+   lscpu | grep "Model name"
+   # Should show: AMD Ryzen Threadripper 3960X
+   
+   lscpu | grep "^CPU(s):"
+   # Should show: 48 (24 cores × 2 threads)
+
+5. Verify RAM detection
+   free -h
+   # Should show: ~125GB available
+
+6. Install monitoring tools
+   sudo dnf install lm_sensors
+   sudo sensors-detect (answer yes to all)
+   sensors
+   # Should show CPU temp, ~40-50°C idle
+
+PERFORMANCE TUNING
+----------------------------------------------------------------------
+
+1. Disable CPU frequency scaling (max performance)
+   echo performance | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+
+   To make permanent:
+   sudo vim /etc/default/grub
+   # Add to GRUB_CMDLINE_LINUX:
+   # intel_pstate=disable amd_pstate=disable
+   sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+   sudo reboot
+
+2. Increase file descriptor limits
+   sudo vim /etc/security/limits.conf
+   # Add:
+   * soft nofile 65536
+   * hard nofile 65536
+
+3. Disable swap (you have 128GB RAM!)
+   sudo swapoff -a
+   sudo vim /etc/fstab
+   # Comment out swap line
+
+4. Set process priority for CVPipe
+   nice -n -10 ./generate_candidates 10000000000000000000000
+
+COMPILE FLAGS FOR THREADRIPPER
+----------------------------------------------------------------------
+
+Update your Makefile:
+
+CC = gcc
+CFLAGS = -O3 -march=znver2 -mtune=znver2 -fopenmp -Wall
+LDFLAGS = -lgmp
+
+Test compilation:
+cd ~/cvpipe
+make clean
+make
+
+Should compile without warnings
+
+
+SECTION 6: BENCHMARKING & VALIDATION
+======================================================================
+
+STRESS TEST (verify stability)
+----------------------------------------------------------------------
+
+1. CPU stress test (24 hours recommended)
+   sudo dnf install stress-ng
+   stress-ng --cpu 48 --timeout 86400s --metrics
+   
+   Monitor temps:
+   watch -n 1 sensors
+   # Should stay under 85°C
+
+2. Memory test
+   sudo dnf install memtest86+
+   # Or run from GRUB menu
+   # Let it run 4+ passes (8+ hours)
+
+3. Prime hunting stress test
+   cd ~/cvpipe
+   make test
+   # Should complete successfully
+   
+   Then run overnight:
+   nohup make run > test.log 2>&1 &
+   tail -f test.log
+
+BENCHMARK AGAINST YOUR RYZEN
+----------------------------------------------------------------------
+
+Run identical search on both systems:
+
+Ryzen 4700U (your baseline):
+  ./generate_candidates 10000000000000000000
+  time make run
+  # Note: elapsed time
+
+Threadripper 3960X:
+  ./generate_candidates 10000000000000000000
+  time make run
+  # Should be ~3x faster!
+
+Expected speedup:
+  • Stage 1 (generate): 2-3x faster
+  • Stage 2 (filter): 2-3x faster
+  • Stage 3 (emirp): 2-3x faster
+
+VERIFY RESULTS MATCH
+----------------------------------------------------------------------
+
+Compare .dat files:
+  diff ryzen_emirps.dat threadripper_emirps.dat
+  # Should be identical!
+
+If results differ:
+  ✗ Check GMP version (should be same)
+  ✗ Check compiler flags
+  ✗ Verify RAM with memtest86+
+
+
+SECTION 7: TWO-SYSTEM STRATEGY
+======================================================================
+
+NAMING CONVENTION
+----------------------------------------------------------------------
+System 1: threadripper01
+System 2: threadripper02
+
+NETWORK SETUP
+----------------------------------------------------------------------
+
+Connect both to same network:
+  • Gigabit ethernet minimum
+  • Same subnet
+  • Static IPs recommended:
+    - threadripper01: 192.168.1.101
+    - threadripper02: 192.168.1.102
+
+SSH keys for easy access:
+  ssh-keygen (on your main computer)
+  ssh-copy-id user@threadripper01
+  ssh-copy-id user@threadripper02
+
+PARALLEL SEARCH STRATEGIES
+----------------------------------------------------------------------
+
+Strategy 1: Split range
+----------------------------------------------------------------------
+  threadripper01: Search 10^23 to 5×10^23
+  threadripper02: Search 5×10^23 to 10^24
+  
+  2x speed for same range!
+
+Strategy 2: Different targets
+----------------------------------------------------------------------
+  threadripper01: Deep search (10^24)
+  threadripper02: Verification search (10^20 to 10^21)
+  
+  One explores, one validates
+
+Strategy 3: Simultaneous ranges
+----------------------------------------------------------------------
+  Both search same range, compare results
+  Ultimate verification!
+
+DISTRIBUTED COMPUTING (Advanced)
+----------------------------------------------------------------------
+
+Option A: Manual coordination
+  • Split candidate generation manually
+  • Each system processes own range
+  • Merge results at end
+
+Option B: GNU Parallel
+  sudo dnf install parallel
+  # Generate candidates centrally
+  # Distribute filtering across both systems
+
+Option C: MPI (Message Passing Interface)
+  • Rewrite code with OpenMPI
+  • Unified job across both systems
+  • Complex but powerful
+
+Start with Option A (simplest)
+
+
+SECTION 8: TROUBLESHOOTING
+======================================================================
+
+PROBLEM: System won't POST
+----------------------------------------------------------------------
+□ Check CPU power cable (8-pin connected?)
+□ Check RAM fully seated (push HARD)
+□ Try one stick of RAM in slot A2
+□ Clear CMOS (jumper or button)
+□ Remove all drives, boot with just CPU/RAM
+
+PROBLEM: System crashes under load
+----------------------------------------------------------------------
+□ Check temps (sensors)
+□ Reseat cooler (remount with new paste)
+□ Disable XMP/DOCP (run RAM at 2666MHz)
+□ Update BIOS to latest
+□ Test RAM with memtest86+
+
+PROBLEM: Slow performance
+----------------------------------------------------------------------
+□ Check governor: cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+□ Should say "performance" not "powersave"
+□ Check CPU isn't throttling: lscpu | grep MHz
+□ Should show ~3800 MHz
+
+PROBLEM: Results don't match Ryzen
+----------------------------------------------------------------------
+□ Check GMP version: gmp --version
+□ Recompile with exact same flags
+□ Verify input data identical
+□ Check for RAM errors (memtest86+)
+
+PROBLEM: High temps (>85°C sustained)
+----------------------------------------------------------------------
+□ Remount cooler (reapply paste)
+□ Check fan spinning (should be audible)
+□ Improve case airflow (add fans)
+□ Reduce voltage slightly in BIOS
+
+PROBLEM: Intermittent crashes
+----------------------------------------------------------------------
+□ Update BIOS
+□ Run memtest86+ (24 hours)
+□ Check PSU cables fully seated
+□ Try different RAM slots
+□ RMA if under warranty
+
+
+FINAL CHECKLIST BEFORE FIRST REAL RUN
+======================================================================
+
+□ CPU detected correctly (48 logical CPUs)
+□ All RAM detected (128GB)
+□ Storage detected and mounted
+□ Temps idle under 50°C
+□ Stress test passed (24 hours)
+□ Memory test passed (4+ passes)
+□ Test compile successful
+□ Benchmark shows 2-3x speedup vs Ryzen
+□ Results match Ryzen on test run
+□ Monitoring tools installed (htop, sensors)
+□ SSH access configured
+□ Backed up current work
+
+
+YOU'RE READY TO HUNT!
+======================================================================
+
+At this point you have:
+✓ 24-core beast ready to go
+✓ 3x faster than your current system
+✓ Stable 24/7 operation
+✓ Linux optimized for performance
+✓ Validated against known results
+
+Time to push beyond 10^22! 🚀
+
+Questions during build? Issues? Hit me up!
+You've got this! The hardest part is waiting for parts to arrive.
+
+Happy building!
+- Claude
+
+P.S. Take photos during the build! It's satisfying to look back on.
+P.P.S. That OEIS reviewer can still pound sand. 😎

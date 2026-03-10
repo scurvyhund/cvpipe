@@ -4,11 +4,12 @@
  * for the formula 2n² + 2n + 1
  *
  * Valid last-two digits: 01, 13, 21, 41, 61, 81 (proven by cycle analysis)
- * Valid first-two digits for emirps: 10, 12, 14, 16, 18, 31 (derived from symmetry)
+ * Valid first-two digits for emirps: 10, 12, 14, 16, 18, 31 (derived from 
+ * symmetry).
  *
  * Compile: gcc -O3 -Wall calc_zones_gmp.c -o calc_zones_gmp -lgmp -lm
  * Usage: ./calc_zones_gmp <min_prime> <max_prime>
- * Example: ./calc_zones_gmp 1000000000000000000000000 10000000000000000000000000
+ * Examp: ./calc_zones_gmp 1000000000000000000000000 10000000000000000000000000
  */
 
 #include <stdio.h>
@@ -22,6 +23,7 @@
 const int VALID_PATTERNS[] = {10, 12, 14, 16, 18, 31};
 const int NUM_PATTERNS = 6;
 
+// Zone struct for zone calculations...
 typedef struct {
     uint64_t n_min;
     uint64_t n_max;
@@ -81,9 +83,11 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    printf("================================================================================\n");
+    printf("=================================================================\
+            ===============\n");
     printf("Zone Calculator for 2n² + 2n + 1 Search\n");
-    printf("================================================================================\n");
+    printf("=================================================================\
+            ===============\n");
     gmp_printf("Prime range: %Zd to %Zd\n", prime_min, prime_max);
     printf("\n");
     
@@ -92,10 +96,11 @@ int main(int argc, char *argv[]) {
     int d_max = count_digits_gmp(prime_max);
     
     printf("Digit range: %d to %d digits\n", d_min, d_max);
-    printf("Valid patterns: 10, 12, 14, 16, 18, 31 (proven from cycle analysis)\n");
+    printf("Valid patterns: 10, 12, 14, 16, 18, 31 (proven from cycle\
+            analysis)\n");
     printf("\n");
     
-    // Storage for zones
+    // Zone strucs storage for zones
     Zone zones[100];  // More than enough for reasonable ranges
     int zone_count = 0;
     
@@ -109,9 +114,11 @@ int main(int argc, char *argv[]) {
     mpz_init(n_max_z);
     mpz_init(power_of_10);
     
-    printf("================================================================================\n");
+    printf("=================================================================\
+            ===============\n");
     printf("VALID SEARCH ZONES:\n");
-    printf("================================================================================\n");
+    printf("=================================================================\
+            ===============\n");
     
     // For each digit count
     for (int d = d_min; d <= d_max; d++) {
@@ -123,8 +130,9 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < NUM_PATTERNS; i++) {
             int pattern = VALID_PATTERNS[i];
             
-            // Calculate prime range for this pattern
-            // Pattern "12" at d=25 means primes from 12×10^23 to 13×10^23 - 1
+            /* Calculate prime range for this pattern (first 2 digits of zone).
+             * Pattern "12" at d=25 means primes from 12×10^23 to 13×10^23 - 1. 
+             */
             mpz_mul_ui(p_zone_min, power_of_10, pattern);
             mpz_mul_ui(p_zone_max, power_of_10, pattern + 1);
             mpz_sub_ui(p_zone_max, p_zone_max, 1);
@@ -168,24 +176,27 @@ int main(int argc, char *argv[]) {
             
             // Print zone info
             printf("\nZone %d:\n", zone_count + 1);
-            printf("  Pattern:      %d (digits starting with %d)\n", pattern, pattern);
-            printf("  Prime range:  %s to %s\n", 
-                   zones[zone_count].prime_min_str, 
-                   zones[zone_count].prime_max_str);
+            printf("  Pattern:      %d (digits starting with %d)\n", pattern, 
+                    pattern);
+            printf("  Prime range:  %s to %s\n",
+                    zones[zone_count].prime_min_str, 
+                    zones[zone_count].prime_max_str);
             printf("  n range:      %lu to %lu\n", 
-                   zones[zone_count].n_min, 
-                   zones[zone_count].n_max);
+                    zones[zone_count].n_min, 
+                    zones[zone_count].n_max);
             printf("  n values:     %lu\n", 
-                   zones[zone_count].n_max - zones[zone_count].n_min + 1);
+                    zones[zone_count].n_max - zones[zone_count].n_min + 1);
             
             zone_count++;
         }
     }
     
     printf("\n");
-    printf("================================================================================\n");
+    printf("=================================================================\
+            ===============\n");
     printf("SUMMARY:\n");
-    printf("================================================================================\n");
+    printf("=================================================================\
+            ===============\n");
     printf("Total valid zones: %d\n", zone_count);
     
     // Calculate total n-values to search
@@ -210,12 +221,15 @@ int main(int argc, char *argv[]) {
            (double)naive_total / total_n);
     
     printf("\n");
-    printf("================================================================================\n");
+    printf("=================================================================\
+            ===============\n");
     printf("ZONE-SKIP CODE TEMPLATE:\n");
-    printf("================================================================================\n");
+    printf("=================================================================\
+            ==============\n");
     printf("\n");
-    printf("// Add this to your search program:\n");
-    printf("typedef struct { uint64_t n_min; uint64_t n_max; int pattern; } SearchZone;\n");
+    printf("// Add this to our search program:\n");
+    printf("typedef struct { uint64_t n_min; uint64_t n_max; int pattern; }\
+             SearchZone;\n");
     printf("\n");
     printf("SearchZone zones[] = {\n");
     for (int i = 0; i < zone_count; i++) {

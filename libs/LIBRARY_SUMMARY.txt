@@ -1,0 +1,174 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║          String & GMP Arithmetic Libraries - Build Summary                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+LOCATION: /home/jim/programming/c/BigFermat/gmp-cvo/libs/
+
+═══════════════════════════════════════════════════════════════════════════════
+  LIBRARY 1: libstrarith.a (Pure C String Library)
+═══════════════════════════════════════════════════════════════════════════════
+
+  Path:         libs/strarith/libstrarith.a
+  Size:         6.3 KB
+  Dependencies: NONE - Pure C, no external libraries required
+  Header:       libs/strarith/strarith.h
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ Exported Functions (7 total)                                            │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │ str_reverse()           - Reverse string into caller's buffer           │
+  │ str_reverse_tls()       - Thread-local string reversal                  │
+  │ str_is_palindrome()     - Check if string is palindrome                 │
+  │ str_is_valid_candidate()- Validate emirp digit patterns                 │
+  │ str_first_n_digits()    - Extract first N digits                        │
+  │ str_last_n_digits()     - Extract last N digits                         │
+  │ str_count_digits()      - Count decimal digits                          │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  Object Files:
+    • str_reverse.o
+    • str_palindrome.o
+    • str_validate.o
+
+  Usage Example:
+    gcc -O3 myprogram.c -Llibs/strarith -lstrarith -o myprogram
+
+═══════════════════════════════════════════════════════════════════════════════
+  LIBRARY 2: libgmparith.a (GMP Arithmetic Library)
+═══════════════════════════════════════════════════════════════════════════════
+
+  Path:         libs/gmparith/libgmparith.a
+  Size:         11 KB
+  Dependencies: GMP library (requires -lgmp)
+  Header:       libs/gmparith/gmparith.h
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ Exported Functions (7 total)                                            │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │ gmp_count_digits()              - Count digits in GMP number            │
+  │ gmp_prime_to_n()                - Convert prime p → n                   │
+  │ gmp_n_to_prime()                - Convert n → prime p                   │
+  │ gmp_is_consec_sq_sum()          - Quick test: p = n² + (n+1)²?          │
+  │ gmp_solve_consec_sqr()          - Solve n² + (n+1)² = p for n           │
+  │ gmp_verify_consecutive_squares()- Full solve + verification             │
+  │ gmp_compute_zones()             - Zone-skip search optimization         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  Object Files:
+    • gmp_digits.o
+    • gmp_conversion.o
+    • gmp_consecutive.o
+    • gmp_zones.o
+
+  Usage Example:
+    gcc -O3 myprogram.c -Llibs/gmparith -lgmparith -lgmp -o myprogram
+
+═══════════════════════════════════════════════════════════════════════════════
+  BUILD & TEST
+═══════════════════════════════════════════════════════════════════════════════
+
+  Build Commands:
+    cd libs/
+    make              # Build both libraries
+    make strarith     # Build libstrarith.a only
+    make gmparith     # Build libgmparith.a only
+    make test         # Build test programs
+    make clean        # Clean all build artifacts
+    make list         # Show library contents
+    make symbols      # Show exported symbols
+
+  Test Results:
+    ✓ libstrarith.a: 6/6 tests passed
+      - String reversal
+      - Thread-local reversal
+      - Palindrome detection
+      - Candidate validation
+      - Digit extraction
+      - Digit counting
+
+    ✓ libgmparith.a: 7/7 tests passed
+      - Known converse prime 12641 (79² + 80²)
+      - Known converse prime 14621 (85² + 86²)
+      - Otto prime 181 (9² + 10²)
+      - Prime ↔ N conversion
+      - Digit counting (10^25)
+      - Large number handling
+      - Non-consecutive square rejection
+
+═══════════════════════════════════════════════════════════════════════════════
+  DESIGN PRINCIPLES
+═══════════════════════════════════════════════════════════════════════════════
+
+  ✓ Separation of Concerns
+    - Pure string functions isolated from GMP
+    - No unnecessary dependencies
+
+  ✓ Modularity
+    - Easy to add new functions
+    - ar r libname.a newfile.o
+
+  ✓ Reusability
+    - libstrarith.a works in ANY C project
+    - libgmparith.a for GMP-based projects
+
+  ✓ Zero Overhead
+    - Static linking - only used functions included
+    - Optimized with -O3
+
+  ✓ Thread Safety
+    - str_reverse_tls() uses __thread storage
+    - All GMP functions thread-safe when used properly
+
+═══════════════════════════════════════════════════════════════════════════════
+  QUICK REFERENCE
+═══════════════════════════════════════════════════════════════════════════════
+
+  Directory Structure:
+    libs/
+    ├── Makefile              # Master build
+    ├── README.md             # Documentation
+    ├── LIBRARY_SUMMARY.txt   # This file
+    ├── strarith/
+    │   ├── libstrarith.a     # Pure C library
+    │   ├── strarith.h        # Public API
+    │   └── *.c source files
+    ├── gmparith/
+    │   ├── libgmparith.a     # GMP library
+    │   ├── gmparith.h        # Public API
+    │   └── *.c source files
+    └── test/
+        ├── test_strarith     # Test program
+        ├── test_gmparith     # Test program
+        └── Makefile
+
+  Adding New Functions:
+    1. Write function in new .c file
+    2. Add prototype to .h file
+    3. Add .o file to Makefile OBJS
+    4. make
+
+  Common Targets:
+    make              → Build both libraries
+    make clean        → Remove build artifacts
+    make list         → Show archive contents
+    make symbols      → Show exported functions
+    cd test && make run → Run all tests
+
+═══════════════════════════════════════════════════════════════════════════════
+  EXTRACTED FROM
+═══════════════════════════════════════════════════════════════════════════════
+
+  These libraries modularize functions from:
+    • cvpipe.c                           (merged pipeline)
+    • utils/calc_zones_gmp.c             (zone calculation)
+    • utils/verify_consec_sq.c           (verification)
+    • four_stage_cvpipe/generate_candidates_gmp.c
+    • four_stage_cvpipe/check_emirp_gmp.c
+
+  Optimized for consecutive square prime research: p = n² + (n+1)² = 2n² + 2n + 1
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Built: 2026-02-15
+All tests passed ✓
+Ready for production use

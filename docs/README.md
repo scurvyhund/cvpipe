@@ -1,16 +1,21 @@
 # CVPipe — Converse Prime Pipeline
 
-CVPipe searches for **converse primes**, an extremely rare class of prime pairs. A converse prime pair (p, q) requires:
+CVPipe searches for 'converse primes', an extremely rare class of prime pairs.
 
-- Both p and q are prime
-- q = reverse(p) (digit reversal)
-- Both can be expressed as n² + (n+1)² for some integer n
+A converse prime pair (p, q) requires:
 
-The only known pair is **12641 ↔ 14621** (n=79, n=85). The search has been extended to 10^24 with no additional pairs found.
+        Both p and q are prime
+        q = reverse(p) (digit reversal)
+        Both can be expressed as n² + (n+1)² for some integer n
+
+The only known pair is **12641 ↔ 14621** (n=79, n=85). The search has been ex-
+tended to 10^24 with no additional pairs found.
 
 ## The Math
 
-The central formula is `p = 2n² + 2n + 1 = n² + (n+1)²`. Given a candidate prime p, solving for n: compute `2p - 1`, check if it's a perfect square, then `n = (sqrt(2p-1) - 1) / 2`.
+The central formula is `p = 2n^2 + 2n + 1 = n^2 + (n+1)^2`. Given a candidate
+prime p, solving for n: compute `2p - 1`, check if it's a perfect square, then 
+`n = (sqrt(2p-1) - 1) / 2`.
 
 ## Quick Start
 
@@ -56,18 +61,22 @@ nohup time ./cvpipe 10000000000000000000000000 > run_10e25.log 2>&1 &
 
 ## How It Works
 
-CVPipe merges 5 pipeline stages into a single in-memory pass — no intermediate files:
+CVPipe merges 5 pipeline stages into a single in-memory pass — no intermediate
+files:
 
-1. **Generate** candidate p = 2n² + 2n + 1
-2. **Gatekeeper** filter on first/last 2 digits (proven digit constraints)
-3. **Zone-skip** iterates only n-ranges producing valid first-2-digit patterns, eliminating ~89% of candidates
-4. **Consec-sq pre-filter** on reversed digits (skip ~96% of Miller-Rabin tests)
-5. **Miller-Rabin** primality (25 rounds) on p and reverse(p)
-6. **Converse check** — verify both p and reverse(p) satisfy n² + (n+1)²
+1.  Generate** candidate p = 2n² + 2n + 1
+2.  Gatekeeper** filter on first/last 2 digits (proven digit constraints)
+3.  Zone-skip** iterates only n-ranges producing valid first-2-digit patterns,
+    eliminating ~89% of candidates
+4.  Consec-sq pre-filter** on reversed digits (skip ~96% of Miller-Rabin tests)
+5.  Miller-Rabin** primality (25 rounds) on p and reverse(p)
+6.  Converse check** — verify both p and reverse(p) satisfy n² + (n+1)²
 
 ### Zone-Skip Optimization
 
-At startup, CVPipe computes valid search zones from 6 proven first-2-digit patterns: {10, 12, 14, 16, 18, 31}. Threads iterate zone-by-zone instead of linearly, giving ~9x fewer candidates at scale.
+At startup, CVPipe computes valid search zones from 6 proven first-2-digit 
+patterns: {10, 12, 14, 16, 18, 31}. Threads iterate zone-by-zone instead of 
+linearly, giving ~9x fewer candidates at scale.
 
 ### Multi-Machine Runs
 
@@ -95,7 +104,8 @@ Split the search by giving each machine a different prime sub-range:
 
 ## Legacy Pipeline
 
-The original 5-stage pipeline (with intermediate `.dat` files) is also included:
+The original 5-stage pipeline (with intermediate `.dat` files) is also includ-
+ed:
 
 | Stage | Program | Purpose |
 |-------|---------|---------|
@@ -107,7 +117,4 @@ The original 5-stage pipeline (with intermediate `.dat` files) is also included:
 | 4 | `check_converse_gmp` | Converse pair detection |
 
 Build all stages with `make all`.
-
-## License
-
 Research project — converse prime hunting.
