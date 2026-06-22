@@ -12,8 +12,8 @@
  *
  * Usage: ./generate_candidates_gmp <max_prime>
  *
- * Last successful run 10e23
- * Last full prime load (10e24) p01-16 saved on big8tera. 1/16/26
+ * Last successful run 10^23
+ * Last full prime load (10^24) p01-16 saved on big8tera. 1/16/26
  * 
  */
 

@@ -40,16 +40,15 @@ char* str_reverse_tls(const char *str);
 
 /* ────────────────────────────────────────────────────────────────────
  * Palindrome Detection
- * ──────────────────────────────────────────────────────────────────── *
+ * ──────────────────────────────────────────────────────────────────── */
 
-**
+/**
  * Check if a string is a palindrome
  * @param str Input string
  * @param len Length of string
  * @return true if palindrome, false otherwise
- *
- * bool str_is_palindrome(const char *str, int len);
  */
+bool str_is_palindrome(const char *str, int len);
 
 /* ────────────────────────────────────────────────────────────────────
  * Digit Pattern Validation

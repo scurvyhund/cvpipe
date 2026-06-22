@@ -461,7 +461,7 @@ int main(int argc, char *argv[]) {
                     continue;
                 st.primes_found++;
 
-                // tep 8: MR on r 
+                // Step 8: MR on reversed_num
                 st.mr_tests++;
                 if (mpz_probab_prime_p(reversed_num, MR_ROUNDS) <= 0)
                     continue;

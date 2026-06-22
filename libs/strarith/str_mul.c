@@ -100,7 +100,7 @@
          // iterate over all of array_1 successively with ea. array_2 digit...
          while(i >= 0 || carry > 0) {
 
-            // tmp can be > 10 at any time time.
+            // tmp can be > 9 at any time.
             if(i >= 0)
                tmp = array_1[i] * array_2[j];
             else 
@@ -115,8 +115,8 @@
             // adds col's sum  value to k
             product_array[k] += (tmp % 10);
 
-            /* if prev instr. made k > 10, calc the 10's digit
-             * out to cy.
+            /* if prev instr. pushed product_array[k] above 9,
+             * extract the carry digit.
              */
             carry += (product_array[k] / 10);
             

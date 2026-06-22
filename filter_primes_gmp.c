@@ -57,7 +57,7 @@ int main(void) {
         // Get thread number from omp for our td struct member td.thread_id...
         int tid = omp_get_thread_num();
 
-        // Create  thread struct based on our td struct data type... 
+        // Create thread struct based on our td struct data type...
         thread_data_t td;
 
         char infile[32], outfile[32];
@@ -92,7 +92,7 @@ int main(void) {
         }
         
         // Read candidates and test for primality
-        char line[256];  // Increased for larger numbers
+        char line[256];
         while (fgets(line, sizeof(line), td.fp_in)) {
             // Remove trailing newline
             line[strcspn(line, "\n")] = 0;

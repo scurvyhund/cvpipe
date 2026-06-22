@@ -65,7 +65,7 @@ int main(void) {
     
    uint64_t total_primes = 0;
    uint64_t total_palindromes = 0;
-   uint64_t total_emirps = 0;  // Changed to counter only
+   uint64_t total_emirps = 0;
     
    omp_set_num_threads(NUM_THREADS);
     

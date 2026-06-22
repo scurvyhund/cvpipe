@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
    printf("Range:     %lu values to search\n", max_n - start_n + 1);
    printf("Threads:   %d\n", NUM_THREADS);
    printf("Formula:   2n² + 2n + 1\n");
-   printf("Output:    p01.dat through p16.dat (APPENDING MODE)\n");
+   printf("Output:    p01.dat through p16.dat (OVERWRITE MODE)\n");
    printf("===============================================================\n");
    printf("\n");
    
@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
       if (!td.error_flag) {
          snprintf(filename, sizeof(filename), "p%02d.dat", tid + 1);
          
-         // write mode - truncates existing files
+         // "w" truncates — overwrites any prior run's output
          td.fp = fopen(filename, "w");
       
          if (!td.fp) {

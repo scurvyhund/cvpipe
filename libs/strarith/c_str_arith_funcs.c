@@ -38,7 +38,7 @@ int string_compare(const char* a, const char* b) {
 }
 
 /* String multiplication using the big-mul.c algorithm
- * This is the core function adapted from my big-mul.c
+ * This is the core function adapted from big-mul.c
  */
 char* string_multiply(const char* num1_str, const char* num2_str) {
     // Handle zero cases
