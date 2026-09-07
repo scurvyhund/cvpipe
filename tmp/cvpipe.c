@@ -1,11 +1,11 @@
-/* cvpipe.c — Merged CVPipe: Con-verse Prime Pipeline (single-pass, no disk I/O)
+/* cvpipe.c - Merged CVPipe: Con-verse Prime Pipeline (single-pass, no disk I/O)
  *
  * Combines all 5 stages into one in-memory pipeline:
- *   Stage 1: Generate candidates (2n² + 2n + 1)
+ *   Stage 1: Generate candidates (2n^2 + 2n + 1)
  *   Stage 2: Miller-Rabin primality test (25 rounds)
  *   Stage 3: Emirp detection (reverse is also prime)
  *   Stage 3.5: Palindromic prime detection (otto primes)
- *   Stage 4: Converse pair detection (both are n² + (n+1)²)
+ *   Stage 4: Converse pair detection (both are n^2 + (n+1)^2)
  *
  * Usage:
  *   ./cvpipe <max_prime>              Full run from n=0
@@ -28,7 +28,7 @@
 #define PROGRESS_INTERVAL 10000000  /* Thread 0 reports every 10M n-values */
 #define MAX_ZONES 64
 
-/* ── Zone-skip: only iterate n-ranges where candidates have valid first-2 digits ── */
+/* -- Zone-skip: only iterate n-ranges where candidates have valid first-2 digits -- */
 typedef struct {
     uint64_t n_min;
     uint64_t n_max;
@@ -40,7 +40,7 @@ typedef struct {
 static const int VALID_PATTERNS[] = {10, 12, 14, 16, 18, 31};
 static const int NUM_PATTERNS = 6;
 
-/* Convert prime p → n via n = floor((sqrt(2p-1) - 1) / 2) */
+/* Convert prime p -> n via n = floor((sqrt(2p-1) - 1) / 2) */
 static void prime_to_n(mpz_t n, mpz_t prime) {
     mpz_t two_p_minus_1, sq;
     mpz_init(two_p_minus_1);
@@ -137,9 +137,9 @@ typedef struct {
     uint64_t otto_found;
 } thread_stats_t;
 
-/* ── Gatekeeper: filter for emirp-viable candidates ──────────────────
+/* -- Gatekeeper: filter for emirp-viable candidates ------------------
  * Valid first2: 1[0,2,4,6,8] or 31
- * Valid last2: ends in 1 or 3, and ≡ 1 (mod 4)
+ * Valid last2: ends in 1 or 3, and == 1 (mod 4)
  * From generate_candidates_gmp.c:57-92
  */
 static bool is_valid_candidate(const char *str, int len) {
@@ -167,9 +167,9 @@ static bool is_valid_candidate(const char *str, int len) {
     return (last_digit == 1 || last_digit == 3) && (last2 % 4 == 1);
 }
 
-/* ── Quick pre-filter: is p a sum of consecutive squares? ────────────
- * p = n² + (n+1)² = 2n² + 2n + 1
- * Requires: p ≡ 1 (mod 4) AND 2p-1 is a perfect square.
+/* -- Quick pre-filter: is p a sum of consecutive squares? ------------
+ * p = n^2 + (n+1)^2 = 2n^2 + 2n + 1
+ * Requires: p == 1 (mod 4) AND 2p-1 is a perfect square.
  * From check_emirp_gmp.c:31-40
  */
 static bool is_consec_sq_sum(mpz_t p, mpz_t disc) {
@@ -181,7 +181,7 @@ static bool is_consec_sq_sum(mpz_t p, mpz_t disc) {
     return mpz_perfect_square_p(disc) != 0;
 }
 
-/* ── Reverse a decimal string in-place into caller's buffer ──────────
+/* -- Reverse a decimal string in-place into caller's buffer ----------
  * From check_emirp_gmp.c:43-52 (adapted: caller provides buffer)
  */
 static void reverse_string(const char *str, int len, char *out) {
@@ -190,7 +190,7 @@ static void reverse_string(const char *str, int len, char *out) {
     out[len] = '\0';
 }
 
-/* ── Check if a decimal string is a palindrome ───────────────────────
+/* -- Check if a decimal string is a palindrome -----------------------
  * From check_emirp_gmp.c:55-65
  */
 static bool is_palindrome_str(const char *str, int len) {
@@ -201,7 +201,7 @@ static bool is_palindrome_str(const char *str, int len) {
     return true;
 }
 
-/* ── Solve n² + (n+1)² = p for n ─────────────────────────────────────
+/* -- Solve n^2 + (n+1)^2 = p for n -------------------------------------
  * n = (-1 + sqrt(2p - 1)) / 2; returns true if n is a non-negative integer.
  * From check_converse_gmp.c:24-66
  */
@@ -213,7 +213,7 @@ static bool solve_consecutive_squares(mpz_t p, mpz_t n_out, mpz_t disc) {
     if (!mpz_perfect_square_p(disc))
         return false;
 
-    /* sqrt_d = sqrt(disc) — reuse disc as temp after check */
+    /* sqrt_d = sqrt(disc) -- reuse disc as temp after check */
     mpz_t sqrt_d;
     mpz_init(sqrt_d);
     mpz_sqrt(sqrt_d, disc);
@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    /* ── Parse arguments ───────────────────────────────────────────── */
+    /* -- Parse arguments --------------------------------------------- */
     uint64_t start_n = 0;
     mpz_t max_prime_z, max_n_z, temp;
     mpz_init(max_prime_z);
@@ -277,15 +277,15 @@ int main(int argc, char *argv[]) {
     mpz_sqrt(max_n_z, temp);
     uint64_t max_n = mpz_get_ui(max_n_z);
 
-    /* ── Compute search zones ─────────────────────────────────────── */
+    /* -- Compute search zones --------------------------------------- */
     /* start_prime = 2*start_n^2 + 2*start_n + 1 */
     mpz_t start_prime_z;
     mpz_init(start_prime_z);
     {
         mpz_t sn;
         mpz_init_set_ui(sn, start_n);
-        mpz_mul(start_prime_z, sn, sn);        /* sn² */
-        mpz_mul_ui(start_prime_z, start_prime_z, 2); /* 2sn² */
+        mpz_mul(start_prime_z, sn, sn);        /* sn^2 */
+        mpz_mul_ui(start_prime_z, start_prime_z, 2); /* 2sn^2 */
         mpz_addmul_ui(start_prime_z, sn, 2);   /* + 2sn */
         mpz_add_ui(start_prime_z, start_prime_z, 1); /* + 1 */
         mpz_clear(sn);
@@ -306,7 +306,7 @@ int main(int argc, char *argv[]) {
 
     uint64_t naive_total = max_n - start_n + 1;
 
-    /* ── Banner ────────────────────────────────────────────────────── */
+    /* -- Banner ------------------------------------------------------ */
     printf("\n");
     printf("  CVPipe — Merged Con-verse Prime Pipeline\n");
     printf("==============================================================\n");
@@ -347,7 +347,7 @@ int main(int argc, char *argv[]) {
     mpz_clear(max_n_z);
     mpz_clear(temp);
 
-    /* ── Open output files ─────────────────────────────────────────── */
+    /* -- Open output files ------------------------------------------- */
     FILE *fp_converse = fopen("converse.dat", "w");
     if (!fp_converse) {
         fprintf(stderr, "Error: cannot create converse.dat\n");
@@ -365,7 +365,7 @@ int main(int argc, char *argv[]) {
 
     omp_set_num_threads(NUM_THREADS);
 
-    /* ── Global statistics (reduced across threads) ────────────────── */
+    /* -- Global statistics (reduced across threads) ------------------ */
     uint64_t g_candidates = 0, g_gatekeeper = 0, g_palindromes = 0;
     uint64_t g_consec_sq  = 0, g_mr_tests   = 0, g_primes      = 0;
     uint64_t g_emirps     = 0, g_converse   = 0, g_otto        = 0;
@@ -386,11 +386,11 @@ int main(int argc, char *argv[]) {
         mpz_init(n1_out);
         mpz_init(n2_out);
 
-        /* Stack buffers — no malloc per iteration */
+        /* Stack buffers -- no malloc per iteration */
         char cand_str[256];
         char rev_str[256];
 
-        /* ── Zone-aware iteration ──────────────────────────────────── */
+        /* -- Zone-aware iteration ------------------------------------ */
         for (int z = 0; z < num_zones; z++) {
             uint64_t zone_start = zones[z].n_min;
             uint64_t zone_end   = zones[z].n_max;
@@ -403,24 +403,24 @@ int main(int argc, char *argv[]) {
 
             for (uint64_t n = first_n; n <= zone_end; n += NUM_THREADS) {
 
-                /* ── Step 1: Compute p = 2n² + 2n + 1 ─────────────── */
+                /* -- Step 1: Compute p = 2n^2 + 2n + 1 --------------- */
                 mpz_set_ui(n_z, n);
-                mpz_mul(candidate, n_z, n_z);           /* n² */
-                mpz_mul_ui(candidate, candidate, 2);     /* 2n² */
+                mpz_mul(candidate, n_z, n_z);           /* n^2 */
+                mpz_mul_ui(candidate, candidate, 2);     /* 2n^2 */
                 mpz_addmul_ui(candidate, n_z, 2);        /* + 2n */
                 mpz_add_ui(candidate, candidate, 1);      /* + 1 */
                 st.candidates_generated++;
 
-                /* ── Step 2: Convert to string (stack buffer) ──────── */
+                /* -- Step 2: Convert to string (stack buffer) -------- */
                 gmp_sprintf(cand_str, "%Zd", candidate);
                 int len = strlen(cand_str);
 
-                /* ── Step 3: Gatekeeper filter (safety net) ────────── */
+                /* -- Step 3: Gatekeeper filter (safety net) ---------- */
                 if (!is_valid_candidate(cand_str, len))
                     continue;
                 st.gatekeeper_passed++;
 
-                /* ── Step 4: Palindrome branch ─────────────────────── */
+                /* -- Step 4: Palindrome branch ----------------------- */
                 if (is_palindrome_str(cand_str, len)) {
                     st.palindromes_found++;
                     /* MR test on palindromic candidate */
@@ -440,28 +440,28 @@ int main(int argc, char *argv[]) {
                     continue;  /* palindromes are never emirps */
                 }
 
-                /* ── Step 5: Reverse digits ────────────────────────── */
+                /* -- Step 5: Reverse digits -------------------------- */
                 reverse_string(cand_str, len, rev_str);
 
-                /* ── Step 6: is_consec_sq_sum on reversed? ─────────── */
+                /* -- Step 6: is_consec_sq_sum on reversed? ----------- */
                 mpz_set_str(reversed_num, rev_str, 10);
                 if (!is_consec_sq_sum(reversed_num, disc))
                     continue;
                 st.consec_sq_passed++;
 
-                /* ── Step 7: MR on p ───────────────────────────────── */
+                /* -- Step 7: MR on p --------------------------------- */
                 st.mr_tests++;
                 if (mpz_probab_prime_p(candidate, MR_ROUNDS) <= 0)
                     continue;
                 st.primes_found++;
 
-                /* ── Step 8: MR on r ───────────────────────────────── */
+                /* -- Step 8: MR on r --------------------------------- */
                 st.mr_tests++;
                 if (mpz_probab_prime_p(reversed_num, MR_ROUNDS) <= 0)
                     continue;
                 st.emirps_found++;
 
-                /* ── Step 9: Solve consecutive squares for both ────── */
+                /* -- Step 9: Solve consecutive squares for both ------ */
                 bool p_ok = solve_consecutive_squares(candidate, n1_out, disc);
                 bool r_ok = solve_consecutive_squares(reversed_num, n2_out, disc);
 
@@ -484,7 +484,7 @@ int main(int argc, char *argv[]) {
                     }
                 }
 
-                /* ── Progress reporting (thread 0 only) ────────────── */
+                /* -- Progress reporting (thread 0 only) -------------- */
                 if (tid == 0 && st.candidates_generated % PROGRESS_INTERVAL == 0) {
                     double elapsed = omp_get_wtime() - omp_start;
                     printf("  [%6.1fs] zone=%d/%d  n=%lu  gate=%lu  consec_sq=%lu  mr=%lu\n",
@@ -520,7 +520,7 @@ int main(int argc, char *argv[]) {
     double elapsed = omp_get_wtime() - omp_start;
     time_t wall_end = time(NULL);
 
-    /* ── Summary ───────────────────────────────────────────────────── */
+    /* -- Summary ----------------------------------------------------- */
     printf("\n==============================================================\n");
     printf("  CVPipe COMPLETE\n");
     printf("==============================================================\n");

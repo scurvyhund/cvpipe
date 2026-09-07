@@ -1,7 +1,7 @@
 /* calc_zones_gmp.c
  *
  * Calculate valid search zones based on proven digit constraints
- * for the formula 2n² + 2n + 1
+ * for the formula 2n^2 + 2n + 1
  *
  * Valid last-two digits: 01, 13, 21, 41, 61, 81 (proven by cycle analysis)
  * Valid first-two digits for emirps: 10, 12, 14, 16, 18, 31 (derived from symmetry)
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
             int pattern = VALID_PATTERNS[i];
             
             // Calculate prime range for this pattern
-            // Pattern "12" at d=25 means primes from 12×10^23 to 13×10^23 - 1
+            // Pattern "12" at d=25 means primes from 12x10^23 to 13x10^23 - 1
             mpz_mul_ui(p_zone_min, power_of_10, pattern);
             mpz_mul_ui(p_zone_max, power_of_10, pattern + 1);
             mpz_sub_ui(p_zone_max, p_zone_max, 1);

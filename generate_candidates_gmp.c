@@ -2,10 +2,10 @@
  * 
  * GMP version - handles numbers beyond 2^64
  * Generate all n^2 + (n+1)^2 values using 16 threads
- * Each thread handles n ≡ k (mod 16) for k = 0..15
+ * Each thread handles n == k (mod 16) for k = 0..15
  * Output: p01.dat through p16.dat (text, one number per line)
  *
- * By construction, all outputs are ≡ 1 (mod 4)
+ * By construction, all outputs are == 1 (mod 4)
  * 
  * Compile: gcc -O3 -march=znver2 -fopenmp -Wall generate_candidates_gmp.c -o\
  *              generate_candidates_gmp -lgmp
@@ -53,7 +53,7 @@ void flush_buffer(thread_data_t *td) {
 
 // Gatekeeper: filter for emirp-viable candidates
 // Valid first2: 1[0,2,4,6,8] or 31
-// Valid last2: ends in 1 or 3, and ≡ 1 (mod 4)
+// Valid last2: ends in 1 or 3, and == 1 (mod 4)
 bool is_valid_candidate(const char *str) {
     int len = strlen(str);
     
@@ -78,7 +78,7 @@ bool is_valid_candidate(const char *str) {
     
     if (!valid_first2) return false;
     
-    // Check last2: must end in 1 or 3, and ≡ 1 (mod 4)
+    // Check last2: must end in 1 or 3, and == 1 (mod 4)
     // Get last two digits
     int last_digit = str[len - 1] - '0';
     int second_last = (len >= 2) ? str[len - 2] - '0' : 0;

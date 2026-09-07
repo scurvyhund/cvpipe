@@ -1,7 +1,7 @@
 /* last_two_cycle.c
  * 
  * Verification code that proved the 6 valid last-two-digit patterns
- * for the formula 2n² + 2n + 1
+ * for the formula 2n^2 + 2n + 1
  * 
  * Historical significance: This computation provided mathematical proof
  * that the gatekeeper filter is not heuristic but mathematically rigorous.
@@ -99,7 +99,7 @@ int main() {
     }
     printf("\n");
     
-    // Filter for values ≡ 1 (mod 4) that end in 1 or 3
+    // Filter for values == 1 (mod 4) that end in 1 or 3
     printf("\nFiltered for (value mod 4 = 1) AND (ends in 1 or 3):\n");
     printf("===========================================\n");
     

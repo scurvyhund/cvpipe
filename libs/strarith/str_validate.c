@@ -29,7 +29,7 @@ bool str_is_valid_candidate(const char *str, int len) {
 
     if (!valid_first2) return false;
 
-    // Check last2: must end in 1 or 3, and ≡ 1 (mod 4)
+    // Check last2: must end in 1 or 3, and == 1 (mod 4)
     int last_digit   = str[len - 1] - '0';
     int second_last  = str[len - 2] - '0';
     int last2 = second_last * 10 + last_digit;

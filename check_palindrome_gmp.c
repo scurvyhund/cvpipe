@@ -38,10 +38,10 @@ static bool solve_consecutive_squares(mpz_t p, mpz_t n_out) {
     // n^2 + (n+1)^2 = p
     // 2n^2 + 2n + 1 = p
     // 2n^2 + 2n + (1-p) = 0
-    // Using quadratic formula: n = (-2 ± sqrt(4 - 8(1-p))) / 4
-    //                            = (-2 ± sqrt(4 + 8p - 8)) / 4
-    //                            = (-2 ± sqrt(8p - 4)) / 4
-    //                            = (-1 ± sqrt(2p - 1)) / 2
+    // Using quadratic formula: n = (-2 +/- sqrt(4 - 8(1-p))) / 4
+    //                            = (-2 +/- sqrt(4 + 8p - 8)) / 4
+    //                            = (-2 +/- sqrt(8p - 4)) / 4
+    //                            = (-1 +/- sqrt(2p - 1)) / 2
     
     mpz_t discriminant, sqrt_d, numerator;
     mpz_init(discriminant);

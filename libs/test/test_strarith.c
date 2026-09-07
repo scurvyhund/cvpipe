@@ -15,7 +15,7 @@ int main(void) {
     printf("║  libstrarith.a Test Suite (Pure C String Library)           ║\n");
     printf("╚══════════════════════════════════════════════════════════════╝\n\n");
 
-    /* ── Test 1: String Reversal ─────────────────────────────────── */
+    /* -- Test 1: String Reversal ----------------------------------- */
     printf("Test 1: String Reversal\n");
     printf("───────────────────────────────────────────────────────────────\n");
     const char *test1 = "12641";
@@ -26,7 +26,7 @@ int main(void) {
     printf("  Expected: 14621\n");
     printf("  Result:   %s\n\n", strcmp(rev1, "14621") == 0 ? "✓ PASS" : "✗ FAIL");
 
-    /* ── Test 2: Thread-local Reversal ───────────────────────────── */
+    /* -- Test 2: Thread-local Reversal ----------------------------- */
     printf("Test 2: Thread-local String Reversal\n");
     printf("───────────────────────────────────────────────────────────────\n");
     const char *test2 = "3187813";
@@ -36,7 +36,7 @@ int main(void) {
     printf("  Expected: 3187813 (palindrome)\n");
     printf("  Result:   %s\n\n", strcmp(rev2, "3187813") == 0 ? "✓ PASS" : "✗ FAIL");
 
-    /* ── Test 3: Palindrome Detection ────────────────────────────── */
+    /* -- Test 3: Palindrome Detection ------------------------------ */
     printf("Test 3: Palindrome Detection\n");
     printf("───────────────────────────────────────────────────────────────\n");
     const char *pal1 = "12321";
@@ -49,13 +49,13 @@ int main(void) {
            (str_is_palindrome(pal1, strlen(pal1)) &&
             !str_is_palindrome(pal2, strlen(pal2))) ? "✓ PASS" : "✗ FAIL");
 
-    /* ── Test 4: Candidate Validation ────────────────────────────── */
+    /* -- Test 4: Candidate Validation ------------------------------ */
     printf("Test 4: Candidate Validation (emirp digit patterns)\n");
     printf("───────────────────────────────────────────────────────────────\n");
     const char *valid1   = "12641";   // starts with 12, ends with 41
     const char *valid2   = "10000001"; // starts with 10, ends with 01
     const char *invalid1 = "22641";   // starts with 22 (invalid)
-    const char *invalid2 = "12642";   // ends with 42 (not ≡ 1 mod 4)
+    const char *invalid2 = "12642";   // ends with 42 (not == 1 mod 4)
 
     printf("  %s: %s (expected: valid)\n", valid1,
            str_is_valid_candidate(valid1, strlen(valid1)) ? "valid" : "invalid");
@@ -72,7 +72,7 @@ int main(void) {
                       !str_is_valid_candidate(invalid2, strlen(invalid2));
     printf("  Result:   %s\n\n", test4_pass ? "✓ PASS" : "✗ FAIL");
 
-    /* ── Test 5: Digit Extraction ────────────────────────────────── */
+    /* -- Test 5: Digit Extraction ---------------------------------- */
     printf("Test 5: Digit Extraction\n");
     printf("───────────────────────────────────────────────────────────────\n");
     const char *num = "12641";
@@ -83,7 +83,7 @@ int main(void) {
     printf("  Last 2:   %d (expected: 41)\n", last2);
     printf("  Result:   %s\n\n", (first2 == 12 && last2 == 41) ? "✓ PASS" : "✗ FAIL");
 
-    /* ── Test 6: Digit Counting ──────────────────────────────────── */
+    /* -- Test 6: Digit Counting ------------------------------------ */
     printf("Test 6: Digit Counting\n");
     printf("───────────────────────────────────────────────────────────────\n");
     const char *num1 = "12641";

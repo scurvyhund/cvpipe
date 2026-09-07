@@ -1,8 +1,8 @@
 /*
  * verify_consec_sq.c
  *
- * Verify if a number p is a sum of consecutive squares: p = n² + (n+1)²
- * Also checks p ≡ 1 (mod 4) and primality.
+ * Verify if a number p is a sum of consecutive squares: p = n^2 + (n+1)^2
+ * Also checks p == 1 (mod 4) and primality.
  *
  * Compile: gcc -O3 -Wall verify_consec_sq.c -o verify_consec_sq -lgmp
  * Usage:   ./verify_consec_sq <number>

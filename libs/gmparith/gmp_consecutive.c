@@ -1,13 +1,13 @@
 /* gmp_consecutive.c
  *
  * Consecutive square sum testing and solving
- * p = n² + (n+1)² = 2n² + 2n + 1
+ * p = n^2 + (n+1)^2 = 2n^2 + 2n + 1
  */
 
 #include "gmparith.h"
 
 bool gmp_is_consec_sq_sum(mpz_t p, mpz_t disc) {
-    /* Quick filter: all consecutive square sums ≡ 1 (mod 4) */
+    /* Quick filter: all consecutive square sums == 1 (mod 4) */
     if (mpz_fdiv_ui(p, 4) != 1) {
         return false;
     }
@@ -63,10 +63,10 @@ bool gmp_verify_consecutive_squares(mpz_t p, mpz_t n_out) {
         return false;
     }
 
-    /* Verify by computing n² + (n+1)² */
+    /* Verify by computing n^2 + (n+1)^2 */
     mpz_add_ui(n_plus_1, n_out, 1);
-    mpz_mul(verify, n_out, n_out);                /* verify = n² */
-    mpz_addmul(verify, n_plus_1, n_plus_1);       /* verify += (n+1)² */
+    mpz_mul(verify, n_out, n_out);                /* verify = n^2 */
+    mpz_addmul(verify, n_plus_1, n_plus_1);       /* verify += (n+1)^2 */
 
     /* Check if matches original p */
     bool valid = (mpz_cmp(verify, p) == 0);

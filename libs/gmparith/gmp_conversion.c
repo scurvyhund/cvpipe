@@ -1,7 +1,7 @@
 /* gmp_conversion.c
  *
  * Conversion between prime p and n for consecutive square formula
- * p = n² + (n+1)² = 2n² + 2n + 1
+ * p = n^2 + (n+1)^2 = 2n^2 + 2n + 1
  */
 
 #include "gmparith.h"
@@ -27,9 +27,9 @@ void gmp_prime_to_n(mpz_t n, mpz_t prime) {
 }
 
 void gmp_n_to_prime(mpz_t prime, mpz_t n) {
-    /* p = 2n² + 2n + 1 */
-    mpz_mul(prime, n, n);              /* prime = n² */
-    mpz_mul_ui(prime, prime, 2);       /* prime = 2n² */
+    /* p = 2n^2 + 2n + 1 */
+    mpz_mul(prime, n, n);              /* prime = n^2 */
+    mpz_mul_ui(prime, prime, 2);       /* prime = 2n^2 */
     mpz_addmul_ui(prime, n, 2);        /* prime += 2n */
     mpz_add_ui(prime, prime, 1);       /* prime += 1 */
 }

@@ -2,7 +2,7 @@
  * 
  * GMP version - handles numbers beyond 2^64
  * Generate all n^2 + (n+1)^2 values for n in RANGE [start_n, end_n]
- * Each thread handles n ≡ k (mod 16) for k = 0..15
+ * Each thread handles n == k (mod 16) for k = 0..15
  * Output: p01.dat through p16.dat (text, one number per line)
  * 
  * INCREMENTAL SEARCH VERSION - Continue from previous run!

@@ -21,7 +21,7 @@ int main(void) {
     printf("║  libgmparith.a Test Suite (GMP Arithmetic Library)          ║\n");
     printf("╚══════════════════════════════════════════════════════════════╝\n\n");
 
-    /* ── Test 1: Known Converse Pair (12641) ─────────────────────── */
+    /* -- Test 1: Known Converse Pair (12641) ----------------------- */
     printf("Test 1: Known Converse Prime 12641 = 79² + 80²\n");
     printf("───────────────────────────────────────────────────────────────\n");
     mpz_set_ui(p, 12641);
@@ -43,7 +43,7 @@ int main(void) {
         printf("  ✗ Not a consecutive square sum\n  Result:   ✗ FAIL\n\n");
     }
 
-    /* ── Test 2: Known Converse Pair (14621) ─────────────────────── */
+    /* -- Test 2: Known Converse Pair (14621) ----------------------- */
     printf("Test 2: Known Converse Prime 14621 = 85² + 86²\n");
     printf("───────────────────────────────────────────────────────────────\n");
     mpz_set_ui(p, 14621);
@@ -56,7 +56,7 @@ int main(void) {
         printf("  ✗ Verification failed\n  Result:   ✗ FAIL\n\n");
     }
 
-    /* ── Test 3: Otto Prime (palindrome) ─────────────────────────── */
+    /* -- Test 3: Otto Prime (palindrome) --------------------------- */
     printf("Test 3: Otto Prime 181 = 9² + 10²\n");
     printf("───────────────────────────────────────────────────────────────\n");
     mpz_set_ui(p, 181);
@@ -69,7 +69,7 @@ int main(void) {
         printf("  ✗ Failed to solve\n  Result:   ✗ FAIL\n\n");
     }
 
-    /* ── Test 4: Prime-to-N Conversion ───────────────────────────── */
+    /* -- Test 4: Prime-to-N Conversion ----------------------------- */
     printf("Test 4: Prime ↔ N Conversion\n");
     printf("───────────────────────────────────────────────────────────────\n");
     mpz_set_ui(p, 12641);
@@ -80,7 +80,7 @@ int main(void) {
     gmp_printf("  n = 79 → p = %Zd (expected: 12641)\n", verify);
     printf("  Result:   %s\n\n", mpz_cmp(verify, p) == 0 ? "✓ PASS" : "✗ FAIL");
 
-    /* ── Test 5: Digit Counting ──────────────────────────────────── */
+    /* -- Test 5: Digit Counting ------------------------------------ */
     printf("Test 5: Digit Counting\n");
     printf("───────────────────────────────────────────────────────────────\n");
     mpz_set_str(p, "1000000000000000000000000", 10);  // 10^24
@@ -89,7 +89,7 @@ int main(void) {
     printf("  Digits: %d (expected: 25)\n", digits);
     printf("  Result:   %s\n\n", digits == 25 ? "✓ PASS" : "✗ FAIL");
 
-    /* ── Test 6: Large Number ────────────────────────────────────── */
+    /* -- Test 6: Large Number -------------------------------------- */
     printf("Test 6: Large Number (10^25 range)\n");
     printf("───────────────────────────────────────────────────────────────\n");
     mpz_set_str(p, "10000000000000000000000041", 10);  // ~10^25, ends in 41
@@ -107,7 +107,7 @@ int main(void) {
         printf("  Not a consecutive square sum (expected)\n  Result:   ✓ PASS\n\n");
     }
 
-    /* ── Test 7: Non-consecutive Square ──────────────────────────── */
+    /* -- Test 7: Non-consecutive Square ---------------------------- */
     printf("Test 7: Non-consecutive Square (should fail)\n");
     printf("───────────────────────────────────────────────────────────────\n");
     mpz_set_ui(p, 12345);

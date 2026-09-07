@@ -23,13 +23,13 @@
 #define NUM_THREADS 16
 #define MR_ROUNDS 25
 
-/* Quick check: is p a sum of consecutive squares? p = n² + (n+1)² = 2n² + 2n + 1
+/* Quick check: is p a sum of consecutive squares? p = n^2 + (n+1)^2 = 2n^2 + 2n + 1
  * Requires: 2p - 1 is a perfect square.
  * Since 2p-1 is always odd, its square root s is odd, so n = (s-1)/2 is integral.
  * No parity check needed beyond the perfect square test.
  */
 static bool is_consec_sq_sum(mpz_t p, mpz_t disc) {
-    /* All consecutive square sums ≡ 1 (mod 4) — filters ~75% instantly */
+    /* All consecutive square sums == 1 (mod 4) -- filters ~75% instantly */
     if (mpz_fdiv_ui(p, 4) != 1) return false;
 
     /* disc = 2p - 1 */

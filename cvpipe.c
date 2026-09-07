@@ -1,12 +1,12 @@
-/* cvpipe.c — Merged CVPipe: Con-verse Prime Pipeline (single-pass, no disk 
+/* cvpipe.c -- Merged CVPipe: Con-verse Prime Pipeline (single-pass, no disk 
  *            I/O)
  *
  * Combines all 5 stages into one in-memory pipeline:
- *   Stage 1: Generate candidates (2n² + 2n + 1)
+ *   Stage 1: Generate candidates (2n^2 + 2n + 1)
  *   Stage 2: Miller-Rabin primality test (25 rounds)
  *   Stage 3: Emirp detection (reverse is also prime)
  *   Stage 3.5: Palindromic prime detection (otto primes)
- *   Stage 4: Converse pair detection (both are n² + (n+1)²)
+ *   Stage 4: Converse pair detection (both are n^2 + (n+1)^2)
  *
  * Usage:
  *   ./cvpipe <max_prime>              Full run from n=0
@@ -41,7 +41,7 @@ typedef struct {
 static const int VALID_PATTERNS[] = {10, 12, 14, 16, 18, 31};
 static const int NUM_PATTERNS = 6;
 
-// Convert prime p → n via n = floor((sqrt(2p-1) - 1) / 2) 
+// Convert prime p -> n via n = floor((sqrt(2p-1) - 1) / 2) 
 static void prime_to_n(mpz_t n, mpz_t prime) {
     mpz_t two_p_minus_1, sq;
     mpz_init(two_p_minus_1);
@@ -142,7 +142,7 @@ typedef struct {
 
 /* Gatekeeper: filter for emirp-viable candidates 
  * Valid first2: 1[0,2,4,6,8] or 31
- * Valid last2: ends in 1 or 3, and ≡ 1 (mod 4)
+ * Valid last2: ends in 1 or 3, and == 1 (mod 4)
  * From generate_candidates_gmp.c:57-92
  */
 static bool is_valid_candidate(const char *str, int len) {
@@ -171,8 +171,8 @@ static bool is_valid_candidate(const char *str, int len) {
 }
 
 /* Quick pre-filter: is p a sum of consecutive squares? 
- * p = n² + (n+1)² = 2n² + 2n + 1
- * Requires: p ≡ 1 (mod 4) AND 2p-1 is a perfect square.
+ * p = n^2 + (n+1)^2 = 2n^2 + 2n + 1
+ * Requires: p == 1 (mod 4) AND 2p-1 is a perfect square.
  * From check_emirp_gmp.c:31-40
  */
 static bool is_consec_sq_sum(mpz_t p, mpz_t disc) {
@@ -204,7 +204,7 @@ static bool is_palindrome_str(const char *str, int len) {
     return true;
 }
 
-/* Solve n² + (n+1)² = p for n 
+/* Solve n^2 + (n+1)^2 = p for n 
  * n = (-1 + sqrt(2p - 1)) / 2; returns true if n is a non-negative integer.
  * From check_converse_gmp.c:24-66
  */
@@ -216,7 +216,7 @@ static bool solve_consec_sqrs(mpz_t p, mpz_t n_out, mpz_t disc) {
     if (!mpz_perfect_square_p(disc))
         return false;
 
-    // sqrt_d = sqrt(disc) — reuse disc as temp after check 
+    // sqrt_d = sqrt(disc) -- reuse disc as temp after check 
     mpz_t sqrt_d;
     mpz_init(sqrt_d);
     mpz_sqrt(sqrt_d, disc);
@@ -349,7 +349,7 @@ int main(int argc, char *argv[]) {
     mpz_clear(max_n_z);
     mpz_clear(temp);
 
-    // ── Open output files 
+    // -- Open output files 
     FILE *fp_converse = fopen("converse.dat", "w");
     if (!fp_converse) {
         fprintf(stderr, "Error: cannot create converse.dat\n");
@@ -388,7 +388,7 @@ int main(int argc, char *argv[]) {
         mpz_init(n1_out);
         mpz_init(n2_out);
 
-        // Stack buffers — no malloc per iteration 
+        // Stack buffers -- no malloc per iteration 
         char cand_str[256];
         char rev_str[256];
 

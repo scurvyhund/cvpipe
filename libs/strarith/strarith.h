@@ -17,9 +17,9 @@
 
 typedef unsigned __int128   u128;
 
-/* ────────────────────────────────────────────────────────────────────
+/* --------------------------------------------------------------------
  * String Reversal
- * ──────────────────────────────────────────────────────────────────── */
+ * -------------------------------------------------------------------- */
 
 /**
  * Reverse a string into caller-provided buffer
@@ -38,9 +38,9 @@ void str_reverse(const char *str, int len, char *out);
 char* str_reverse_tls(const char *str);
 
 
-/* ────────────────────────────────────────────────────────────────────
+/* --------------------------------------------------------------------
  * Palindrome Detection
- * ──────────────────────────────────────────────────────────────────── */
+ * -------------------------------------------------------------------- */
 
 /**
  * Check if a string is a palindrome
@@ -50,16 +50,16 @@ char* str_reverse_tls(const char *str);
  */
 bool str_is_palindrome(const char *str, int len);
 
-/* ────────────────────────────────────────────────────────────────────
+/* --------------------------------------------------------------------
  * Digit Pattern Validation
- * ──────────────────────────────────────────────────────────────────── */
+ * -------------------------------------------------------------------- */
 
 /**
  * Check if candidate matches valid first/last 2-digit patterns
- * for consecutive square emirps (2n² + 2n + 1)
+ * for consecutive square emirps (2n^2 + 2n + 1)
  *
  * Valid first2: {10, 12, 14, 16, 18, 31}
- * Valid last2: ends in 1 or 3, and ≡ 1 (mod 4)
+ * Valid last2: ends in 1 or 3, and == 1 (mod 4)
  *
  * @param str Input string (decimal number)
  * @param len Length of string
@@ -84,9 +84,9 @@ bool str_is_palindrome(const char *str, int len);
  * int str_last_n_digits(const char *str, int n);
  */
 
-/* ────────────────────────────────────────────────────────────────────
+/* --------------------------------------------------------------------
  * Digit Counting
- * ──────────────────────────────────────────────────────────────────── */
+ * -------------------------------------------------------------------- */
 
 /**
  * Count decimal digits in a string (excluding leading/trailing whitespace)
