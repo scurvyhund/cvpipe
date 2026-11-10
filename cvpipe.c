@@ -27,7 +27,7 @@
 #define NUM_THREADS 16
 #define MR_ROUNDS 25
 #define PROGRESS_INTERVAL 10000000  // Thread 0 reports every 10M n-values 
-#define MAX_ZONES 64
+#define MAX_ZONES 256  // 6 per digit length; uint64_t n caps d at 39
 
 // Zone-skip: only iterate n-ranges where candidates have valid first-2 digits 
 typedef struct {
@@ -65,7 +65,7 @@ static int count_digits_gmp(mpz_t num) {
 }
 
 /* Compute valid search zones for [prime_min, prime_max].
- * Returns the number of zones stored in zones[].
+ * Returns the number of zones stored in zones[], or -1 if they do not fit.
  */
 static int comput_zone(srch_zone_t *zones, mpz_t prime_min, mpz_t prime_max) {
     int d_min = count_digits_gmp(prime_min);
@@ -87,7 +87,7 @@ static int comput_zone(srch_zone_t *zones, mpz_t prime_min, mpz_t prime_max) {
     for (int d = d_min; d <= d_max; d++) {
         mpz_ui_pow_ui(power_of_10, 10, (unsigned long)(d - 2));
 
-        for (int i = 0; i < NUM_PATTERNS && zone_count < MAX_ZONES; i++) {
+        for (int i = 0; i < NUM_PATTERNS; i++) {
             int pattern = VALID_PATTERNS[i];
 
             /* prime sub-range for this pattern at d digits:
@@ -105,6 +105,14 @@ static int comput_zone(srch_zone_t *zones, mpz_t prime_min, mpz_t prime_max) {
             if (mpz_cmp(p_min, p_max) > 0)
                 continue;
 
+            /* Dropping a zone would silently shrink the search */
+            if (zone_count == MAX_ZONES) {
+                fprintf(stderr, "Error: more than %d search zones needed "
+                        "(reached d=%d); raise MAX_ZONES\n", MAX_ZONES, d);
+                zone_count = -1;
+                goto done;
+            }
+
             prime_to_n(n_min_z, p_min);
             prime_to_n(n_max_z, p_max);
 
@@ -116,6 +124,7 @@ static int comput_zone(srch_zone_t *zones, mpz_t prime_min, mpz_t prime_max) {
         }
     }
 
+done:
     mpz_clear(power_of_10);
     mpz_clear(p_zone_min);
     mpz_clear(p_zone_max);
@@ -300,6 +309,11 @@ int main(int argc, char *argv[]) {
 
     srch_zone_t zones[MAX_ZONES];
     int num_zones = comput_zone(zones, start_prime_z, max_prime_z);
+    if (num_zones < 0) {
+        mpz_clear(start_prime_z);
+        mpz_clear(max_prime_z); mpz_clear(max_n_z); mpz_clear(temp);
+        return 1;
+    }
 
     // Compute zone stats for banner 
     uint64_t total_zone_n = 0;
